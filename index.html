@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NebulaCam - Fixed Layout</title>
+    <style>
+        :root { --primary: #00f2ff; --accent: #ff0055; --glass: rgba(15, 15, 20, 0.8); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; font-family: 'Segoe UI', sans-serif; }
+        body { margin: 0; background: #000; color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        .viewport { position: relative; flex-grow: 1; overflow: hidden; background: #111; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* HUD ELEMENTS (SCREEN VIEW) */
+        .compass-hud { position: absolute; top: 20px; left: 20px; width: 80px; height: 80px; background: var(--glass); border-radius: 50%; border: 2px solid var(--primary); z-index: 20; display: flex; align-items: center; justify-content: center; }
+        .compass-disk { width: 100%; height: 100%; position: relative; transition: transform 0.2s; }
+        .dir { position: absolute; font-size: 10px; font-weight: bold; }
+        .dir-n { top: 5px; left: 50%; transform: translateX(-50%); color: var(--accent); }
+        .dir-e { right: 5px; top: 50%; transform: translateY(-50%); }
+        .dir-s { bottom: 5px; left: 50%; transform: translateX(-50%); }
+        .dir-w { left: 5px; top: 50%; transform: translateY(-50%); }
+
+        .map-widget { position: absolute; bottom: 20px; left: 20px; width: 120px; height: 120px; border-radius: 12px; border: 2px solid #555; overflow: hidden; }
+        iframe { width: 100%; height: 100%; border: none; filter: invert(90%) contrast(1.2); }
+
+        .timestamp { position: absolute; bottom: 20px; right: 20px; text-align: right; }
+        .ts-time { font-size: 28px; color: var(--primary); font-weight: bold; display: block; }
+
+        .controls { height: 130px; background: #000; display: flex; justify-content: space-around; align-items: center; padding-bottom: 20px; border-top: 1px solid #222; }
+        .shutter { width: 75px; height: 75px; border: 4px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .shutter-in { width: 58px; height: 58px; background: #fff; border-radius: 50%; }
+        .shutter:active .shutter-in { background: var(--primary); transform: scale(0.9); }
+
+        .flash-fx { position: fixed; top:0; left:0; width:100%; height:100%; background:#fff; opacity:0; pointer-events:none; z-index:100; }
+        canvas { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="viewport">
+        <video id="video" autoplay playsinline></video>
+        <div id="flash" class="flash-fx"></div>
+
+        <div class="compass-hud" onclick="requestPermission()">
+            <div id="disk" class="compass-disk">
+                <span class="dir dir-n">N</span>
+                <span class="dir dir-e">E</span>
+                <span class="dir dir-s">S</span>
+                <span class="dir dir-w">W</span>
+            </div>
+            <div style="position:absolute; font-size:12px; font-weight:bold;" id="deg-label">0°</div>
+        </div>
+
+        <div class="map-widget">
+            <iframe id="gmap" src=""></iframe>
+        </div>
+
+        <div class="timestamp">
+            <span class="ts-time" id="clock">00:00:00</span>
+            <span id="date" style="font-size: 12px; opacity:0.8;">--/--/--</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="switchCam()" style="background:none; border:none; color:white; font-size:24px;">🔄</button>
+        <div class="shutter" onclick="capture()"><div class="shutter-in"></div></div>
+        <button onclick="alert('Settings')" style="background:none; border:none; color:white; font-size:24px;">⚙️</button>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const video = document.getElementById('video');
+        const disk = document.getElementById('disk');
+        let currentHeading = 0;
+        let lat = 0, lon = 0;
+        let stream, facing = 'environment';
+
+        // 1. CLOCK LOGIC
+        setInterval(() => {
+            const n = new Date();
+            document.getElementById('clock').innerText = n.toLocaleTimeString();
+            document.getElementById('date').innerText = n.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase();
+        }, 1000);
+
+        // 2. CAMERA INITIALIZATION
+        async function start() {
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facing, width: 1920, height: 1080 } });
+            video.srcObject = stream;
+        }
+
+        function switchCam() { facing = facing === 'environment' ? 'user' : 'environment'; start(); }
+
+        // 3. SENSORS (Compass & GPS)
+        function requestPermission() {
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().then(res => {
+                    if (res === 'granted') window.addEventListener('deviceorientation', updateCompass);
+                });
+            } else { window.addEventListener('deviceorientationabsolute', updateCompass); }
+        }
+
+        function updateCompass(e) {
+            let h = e.webkitCompassHeading || (360 - e.alpha);
+            currentHeading = h;
+            disk.style.transform = `rotate(${-h}deg)`;
+            document.getElementById('deg-label').innerText = Math.round(h) + "°";
+        }
+
+        navigator.geolocation.watchPosition(p => {
+            lat = p.coords.latitude; lon = p.coords.longitude;
+            document.getElementById('gmap').src = `https://maps.google.com/maps?q=${lat},${lon}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+        });
+
+        // 4. THE CAPTURE ENGINE
+        function capture() {
+            // Flash Effect
+            const f = document.getElementById('flash'); f.style.opacity = 1; setTimeout(() => f.style.opacity = 0, 100);
+
+            const c = document.getElementById('canvas');
+            c.width = video.videoWidth; c.height = video.videoHeight;
+            const ctx = c.getContext('2d');
+            ctx.drawImage(video, 0, 0, c.width, c.height);
+
+            // --- DRAW WATERMARK ELEMENTS ---
+            ctx.shadowColor = "black"; ctx.shadowBlur = 6; ctx.textBaseline = "middle";
+
+            // A. LOWER RIGHT: TIME & DATE
+            ctx.textAlign = "right";
+            ctx.fillStyle = "#00f2ff"; ctx.font = "bold 60px Courier New";
+            ctx.fillText(document.getElementById('clock').innerText, c.width - 50, c.height - 120);
+            ctx.fillStyle = "white"; ctx.font = "bold 30px Courier New";
+            ctx.fillText(document.getElementById('date').innerText, c.width - 50, c.height - 60);
+
+            // B. LOWER LEFT: GPS DATA BOX
+            ctx.textAlign = "left";
+            ctx.fillStyle = "rgba(0,0,0,0.4)";
+            ctx.fillRect(40, c.height - 130, 400, 90);
+            ctx.fillStyle = "#00f2ff"; ctx.font = "bold 20px Arial";
+            ctx.fillText("GPS COORDINATES", 60, c.height - 100);
+            ctx.fillStyle = "white"; ctx.font = "24px monospace";
+            ctx.fillText(`LAT: ${lat.toFixed(5)}  LON: ${lon.toFixed(5)}`, 60, c.height - 65);
+
+            // C. UPPER LEFT: COMPASS OVERLAY
+            const cx = 150, cy = 150, r = 90;
+            // BG Circle
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fill();
+            ctx.strokeStyle = "#00f2ff"; ctx.lineWidth = 4; ctx.stroke();
+
+            // Directions
+            const dirs = { "N": 0, "NE": 45, "E": 90, "SE": 135, "S": 180, "SW": 225, "W": 270, "NW": 315 };
+            ctx.textAlign = "center";
+            Object.keys(dirs).forEach(label => {
+                const angleRad = (dirs[label] - currentHeading - 90) * (Math.PI / 180);
+                const tx = cx + Math.cos(angleRad) * (r - 25);
+                const ty = cy + Math.sin(angleRad) * (r - 25);
+                ctx.font = label === "N" ? "bold 30px Arial" : "18px Arial";
+                ctx.fillStyle = label === "N" ? "#ff0055" : "white";
+                ctx.fillText(label, tx, ty);
+            });
+            // Center Reading
+            ctx.fillStyle = "#00f2ff"; ctx.font = "bold 24px Arial";
+            ctx.fillText(Math.round(currentHeading) + "°", cx, cy);
+
+            // 5. SAVE
+            setTimeout(() => {
+                const name = prompt("Filename:", "NEBULA_" + Date.now());
+                if(name) {
+                    const link = document.createElement('a');
+                    link.download = name + ".png";
+                    link.href = c.toDataURL("image/png");
+                    link.click();
+                }
+            }, 200);
+        }
+
+        window.onload = () => { start(); requestPermission(); };
+    </script>
+</body>
+</html>
