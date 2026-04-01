@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nokia ActionCam Fix</title>
+    <title>Nokia ActionCam: Export</title>
     <style>
         :root {
             --lcd-bg: #94b494; --lcd-text: #1a1e16;
@@ -29,54 +29,39 @@
             width: 100%; max-width: 320px; height: 220px; background: #7f8c8d; 
             border-radius: 10px; display: flex; justify-content: center; align-items: center; 
             box-shadow: inset 0 0 20px #000; border: 4px solid #000; padding: 5px;
-            box-sizing: border-box;
+            box-sizing: border-box; position: relative;
         }
         .screen { 
             width: 100%; height: 100%; background-color: var(--lcd-bg); 
             position: relative; overflow: hidden; display: flex; flex-direction: column;
         }
 
-        /* Fixed Layers: Camera and Gallery are now on top of everything when active */
-        #cam-layer, #gal-layer { 
-            position: absolute; top:0; left:0; width:100%; height:100%; 
-            display:none; z-index: 50; background: var(--lcd-bg);
-        }
-        video, img { width:100%; height:100%; object-fit:cover; transition: transform 0.2s; }
+        #cam-layer, #gal-layer { position: absolute; top:0; left:0; width:100%; height:100%; display:none; z-index: 50; }
+        video, img { width:100%; height:100%; object-fit:cover; }
 
-        /* Filter Classes */
+        /* Retro Filters */
         .f0_Nokia { filter: grayscale(100%) sepia(100%) hue-rotate(60deg) contrast(140%); }
         .f1_BW    { filter: grayscale(100%) contrast(160%); }
         .f2_Sepia { filter: sepia(100%) contrast(120%); }
 
-        /* UI Overlays */
-        .top-info { 
-            display: flex; justify-content: space-between; font-size: 10px; 
-            padding: 4px; z-index: 100; color: #000; font-weight: bold;
-            background: rgba(148, 180, 148, 0.6); /* Semi-transparent bar */
-        }
-        .ui-center { 
-            flex-grow: 1; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; z-index: 10; 
-            color: #000; text-align: center; font-size: 14px;
-        }
-        .footer { 
-            font-size: 12px; text-align: center; border-top: 1px solid #000; 
-            z-index: 100; padding: 3px 0; color: #000; font-weight: bold;
-            background: rgba(148, 180, 148, 0.6);
-        }
+        .top-info { display: flex; justify-content: space-between; font-size: 10px; padding: 4px; z-index: 100; color: #000; font-weight: bold; background: rgba(148, 180, 148, 0.4); }
+        .ui-center { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; color: #000; text-align: center; }
+        .footer { font-size: 11px; text-align: center; border-top: 1px solid #000; z-index: 100; padding: 3px 0; color: #000; font-weight: bold; background: rgba(148, 180, 148, 0.4); }
 
-        .controls-right { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-left: 15px; }
+        /* Controls - 3x2 Grid */
+        .controls-right { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-left: 12px; }
         .p-btn {
-            width: 65px; height: 50px; background: var(--btn-plastic); border: none;
-            border-radius: 10px; color: white; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px #2d3436; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px;
+            width: 65px; height: 48px; background: var(--btn-plastic); border: none;
+            border-radius: 8px; color: white; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px #2d3436; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 8px;
         }
         .p-btn:active { transform: translateY(2px); box-shadow: 0 2px #2d3436; }
         .p-btn.red { background: var(--rec-red); box-shadow: 0 4px #822222; }
+        .p-btn.blue { background: #2980b9; box-shadow: 0 4px #1a5276; }
 
         #filter-indicator {
-            position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
-            font-size: 10px; color: #fff; background: #000; padding: 2px 8px; border-radius: 10px; z-index: 200; display:none;
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            font-size: 9px; color: #fff; background: #000; padding: 2px 8px; border-radius: 10px; z-index: 200; display:none;
         }
         .rec-active { color: var(--rec-red); animation: pulse 1s infinite; display: none; }
         @keyframes pulse { 50% { opacity: 0; } }
@@ -90,18 +75,16 @@
         <div class="bezel">
             <div class="screen">
                 <div class="top-info">
-                    <span>||||</span> <span id="clock">00:00</span> <span id="rec-status" class="rec-active">●REC</span> <span>||||</span>
+                    <span>|||</span> <span id="clock">00:00</span> <span id="rec-status" class="rec-active">●REC</span> <span>|||</span>
                 </div>
 
                 <div id="cam-layer"><video id="preview" autoplay playsinline muted></video></div>
-                
                 <div id="gal-layer">
                     <img id="gal-img" style="display:none;">
                     <video id="gal-vid" style="display:none;" loop muted playsinline></video>
                 </div>
 
                 <div class="ui-center" id="ui-main">NOKIA<br>ACTION</div>
-
                 <div class="footer" id="ui-footer">MENU</div>
             </div>
         </div>
@@ -109,10 +92,12 @@
 
     <div class="controls-right">
         <button class="p-btn" style="background:#d35400" onclick="cycleFilter()"><span>☼</span>FLTR</button>
-        <button class="p-btn" onclick="navStep(-1)"><span>▲</span>UP</button>
+        <button class="p-btn blue" onclick="flipCamera()"><span>🔄</span>FLIP</button>
+        
         <button class="p-btn red" onclick="pressAction()"><span>OK</span>ACT</button>
-        <button class="p-btn" onclick="navStep(1)"><span>▼</span>DOWN</button>
-        <button class="p-btn" onclick="zoomReset()"><span>0</span>1.0x</button>
+        <button class="p-btn" onclick="navStep(-1)"><span>▲</span>UP</button>
+        
+        <button class="p-btn" onclick="downloadCurrent()"><span>⬇</span>SAVE</button>
         <button class="p-btn" onclick="pressBack()"><span>←</span>BACK</button>
     </div>
 </div>
@@ -120,11 +105,11 @@
 <canvas id="export-buffer" width="640" height="480" style="display:none;"></canvas>
 
 <script>
-    let state = "HOME";
+    let state = "HOME", facingMode = "environment";
     const filters = [
-        {name: "Nokia Green", class: "f0_Nokia"},
-        {name: "Classic B&W", class: "f1_BW"},
-        {name: "Vintage Sepia", class: "f2_Sepia"}
+        {name: "Nokia Green", class: "f0_Nokia", ctxFilter: "grayscale(100%) sepia(100%) hue-rotate(60deg) contrast(140%)"},
+        {name: "Classic B&W", class: "f1_BW", ctxFilter: "grayscale(100%) contrast(160%)"},
+        {name: "Vintage Sepia", class: "f2_Sepia", ctxFilter: "sepia(100%) contrast(120%)"}
     ];
     let filterIdx = 0, zoom = 1.0, photos = [], stream = null, recorder = null, chunks = [];
     let menuIdx = 0, galleryIdx = 0;
@@ -136,29 +121,31 @@
     const buffer = document.getElementById("export-buffer");
 
     function beep(f=800, d=50) {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const o = ctx.createOscillator(); const g = ctx.createGain();
-            o.frequency.value = f; g.gain.value = 0.03; o.connect(g); g.connect(ctx.destination);
-            o.start(); setTimeout(() => o.stop(), d);
-        } catch(e){}
+        try { const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator(); const g = ctx.createGain();
+        o.frequency.value = f; g.gain.value = 0.02; o.connect(g); g.connect(ctx.destination);
+        o.start(); setTimeout(() => o.stop(), d); } catch(e){}
     }
 
     async function startCam(isVid) {
         try {
             if(stream) stream.getTracks().forEach(t => t.stop());
-            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: facingMode, width: 640, height: 480 } 
+            });
             videoPreview.srcObject = stream;
             state = isVid ? "CAMERA_VIDEO" : "CAMERA_PHOTO";
-            
-            // HIDE Menu Layer, SHOW Camera Layer
-            camLayer.style.display = "block"; 
-            galLayer.style.display = "none"; 
-            uiMain.style.visibility = "hidden"; 
+            camLayer.style.display = "block"; galLayer.style.display = "none"; uiMain.style.visibility = "hidden";
             fltrInd.style.display = "block";
-            
             updateUI();
-        } catch (e) { alert("Camera Access Denied"); }
+        } catch (e) { alert("Camera Error"); }
+    }
+
+    async function flipCamera() {
+        if (!state.startsWith("CAMERA")) return;
+        beep(1200, 30);
+        facingMode = (facingMode === "user") ? "environment" : "user";
+        await startCam(state === "CAMERA_VIDEO");
     }
 
     function pressAction() {
@@ -175,12 +162,10 @@
 
     function capturePhoto() {
         const ctx = buffer.getContext("2d");
-        const w = buffer.width, h = buffer.height;
-        const zW = w/zoom, zH = h/zoom;
-        const sX = (w-zW)/2, sY = (h-zH)/2;
-        ctx.drawImage(videoPreview, sX, sY, zW, zH, 0, 0, w, h);
-        photos.push({type: 'img', src: buffer.toDataURL("image/jpeg"), filter: filters[filterIdx].class});
-        uiFooter.innerText = "SAVED!";
+        ctx.filter = filters[filterIdx].ctxFilter; // BAKE FILTER INTO IMAGE
+        ctx.drawImage(videoPreview, 0, 0, 640, 480);
+        photos.push({type: 'img', src: buffer.toDataURL("image/jpeg")});
+        uiFooter.innerText = "CAPTURED!";
         setTimeout(() => updateUI(), 800);
     }
 
@@ -196,7 +181,6 @@
                 const blob = new Blob(chunks, { type: 'video/mp4' });
                 photos.push({type: 'vid', src: URL.createObjectURL(blob), filter: filters[filterIdx].class});
                 uiFooter.innerText = "SAVED!";
-                setTimeout(() => updateUI(), 800);
             };
             recorder.start();
             document.getElementById("rec-status").style.display = "inline";
@@ -204,32 +188,35 @@
         }
     }
 
+    function downloadCurrent() {
+        if (state !== "GALLERY" || photos.length === 0) return;
+        beep(1500, 100);
+        const item = photos[galleryIdx];
+        const link = document.createElement('a');
+        link.href = item.src;
+        link.download = `NOKIA_${Date.now()}.${item.type === 'img' ? 'jpg' : 'mp4'}`;
+        link.click();
+        uiFooter.innerText = "DOWNLOADED";
+    }
+
     function openGallery() {
         if (photos.length === 0) { uiMain.style.visibility = "visible"; uiMain.innerHTML = "EMPTY"; return; }
         state = "GALLERY"; galleryIdx = photos.length - 1;
-        uiMain.style.visibility = "hidden";
-        updateGallery();
+        uiMain.style.visibility = "hidden"; updateGallery();
     }
 
     function updateGallery() {
-        camLayer.style.display = "none"; 
-        galLayer.style.display = "block";
+        camLayer.style.display = "none"; galLayer.style.display = "block";
         const item = photos[galleryIdx];
         const gImg = document.getElementById("gal-img"), gVid = document.getElementById("gal-vid");
-        
-        if(item.type === 'img') { gImg.src = item.src; gImg.style.display = "block"; gVid.style.display = "none"; gImg.className = item.filter; }
+        if(item.type === 'img') { gImg.src = item.src; gImg.style.display = "block"; gVid.style.display = "none"; gImg.className = ""; }
         else { gVid.src = item.src; gVid.style.display = "block"; gImg.style.display = "none"; gVid.className = item.filter; gVid.play(); }
-        
-        uiFooter.innerText = `IMG ${galleryIdx + 1}/${photos.length}`;
+        uiFooter.innerText = `IMG ${galleryIdx + 1}/${photos.length} (SAVE=DWN)`;
     }
 
     function navStep(dir) {
         beep(700, 20);
         if (state === "MENU") { menuIdx = (menuIdx + dir + menus.length) % menus.length; updateUI(); }
-        else if (state.startsWith("CAMERA")) { 
-            zoom = Math.max(1, Math.min(3, zoom + (dir * -0.2))); 
-            videoPreview.style.transform = `scale(${zoom})`; 
-        }
         else if (state === "GALLERY") { galleryIdx = (galleryIdx + dir + photos.length) % photos.length; updateGallery(); }
     }
 
@@ -239,39 +226,21 @@
         fltrInd.innerText = filters[filterIdx].name;
     }
 
-    function zoomReset() { zoom = 1.0; videoPreview.style.transform = "scale(1)"; }
-
     function pressBack() {
         if(stream) stream.getTracks().forEach(t => t.stop());
-        state = "HOME"; 
-        camLayer.style.display = "none"; 
-        galLayer.style.display = "none"; 
-        fltrInd.style.display = "none";
-        uiMain.style.visibility = "visible";
-        updateUI();
+        state = "HOME"; camLayer.style.display = "none"; galLayer.style.display = "none"; 
+        fltrInd.style.display = "none"; uiMain.style.visibility = "visible"; updateUI();
     }
 
     function updateUI() {
-        if (state === "HOME") { 
-            uiMain.style.visibility = "visible"; 
-            uiMain.innerHTML = "NOKIA<br>ACTION"; 
-            uiFooter.innerText = "MENU"; 
-        }
-        else if (state === "MENU") { 
-            uiMain.style.visibility = "visible"; 
-            uiMain.innerHTML = `📂<br>${menus[menuIdx]}`; 
-            uiFooter.innerText = "SELECT (OK)"; 
-        }
-        else if (state.startsWith("CAMERA")) { 
-            uiFooter.innerText = state === "CAMERA_PHOTO" ? "CAPTURE (OK)" : "REC (OK)"; 
-        }
+        if (state === "HOME") { uiMain.style.visibility = "visible"; uiMain.innerHTML = "NOKIA<br>ACTION"; uiFooter.innerText = "MENU"; }
+        else if (state === "MENU") { uiMain.innerHTML = `📂<br>${menus[menuIdx]}`; uiFooter.innerText = "SELECT (OK)"; }
+        else if (state.startsWith("CAMERA")) { uiFooter.innerText = state === "CAMERA_PHOTO" ? "CAPTURE (OK)" : "REC (OK)"; }
     }
 
     setInterval(() => {
         const d = new Date(); document.getElementById('clock').innerText = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
     }, 1000);
-
-    updateUI();
 </script>
 </body>
 </html>
