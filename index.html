@@ -2,2279 +2,276 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMK Advisory - HR Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nokia ActionCam Fix</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
+        :root {
+            --lcd-bg: #94b494; --lcd-text: #1a1e16;
+            --case-finish: #2d3436; --btn-plastic: #636e72; --rec-red: #d63031;
+        }
+
+        body { 
+            background: #111; display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; font-family: 'Courier New', Courier, monospace; 
+            user-select: none; color: white; overflow: hidden;
+        }
+
+        .action-body { 
+            width: 95vw; max-width: 600px; background: var(--case-finish); 
+            border-radius: 20px; box-shadow: 0 20px 60px #000; 
+            display: flex; flex-direction: row; align-items: center; 
+            padding: 15px; position: relative; border: 6px solid #1e272e;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        /* ============ LOGIN PAGE ============ */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .login-box {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 450px;
-            padding: 40px;
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .company-logo {
-            font-size: 48px;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .login-header h1 {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .login-header p {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
-            width: auto;
-            padding: 8px 16px;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
-        /* ============ MAIN APP LAYOUT ============ */
-        .app-container {
-            display: none;
-            min-height: 100vh;
-            background: #f5f7fa;
-        }
-
-        .app-container.active {
-            display: flex;
-        }
-
-        .sidebar {
-            width: 250px;
-            background: #2c3e50;
-            color: white;
-            padding: 20px;
-            overflow-y: auto;
-            min-height: 100vh;
-        }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar-logo {
-            font-size: 28px;
-            margin-right: 10px;
-        }
-
-        .sidebar-title {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .user-info {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 13px;
-        }
-
-        .user-info .name {
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .user-info .role {
-            color: #aaa;
-        }
-
-        .nav-menu {
-            list-style: none;
-        }
-
-        .nav-item {
-            margin-bottom: 10px;
-        }
-
-        .nav-link {
-            display: block;
-            padding: 12px 15px;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background: rgba(102, 126, 234, 0.2);
-            border-left-color: #667eea;
-        }
-
-        .logout-btn {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .logout-btn .nav-link {
-            color: #e74c3c;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            max-height: 100vh;
-        }
-
-        .topbar {
-            background: white;
-            padding: 20px 30px;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: -30px -30px 30px -30px;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .page-title {
-            font-size: 28px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .topbar-actions {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .notification-bell {
-            font-size: 20px;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #e74c3c;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-
-        /* ============ CARDS & CONTENT ============ */
-        .page-content {
-            display: none;
-        }
-
-        .page-content.active {
-            display: block;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-
-        .card:hover {
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
-            transform: translateY(-3px);
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        /* ============ TABLES ============ */
-        .table-container {
-            overflow-x: auto;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        .table th {
-            background: #f5f5f5;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            color: #333;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        .table td {
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .table tbody tr:hover {
-            background: #f9f9f9;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .badge-warning {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .badge-danger {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .badge-info {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        /* ============ FORMS ============ */
-        .form-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-            grid-column: 1 / -1;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            grid-column: 1 / -1;
-        }
-
-        /* ============ MODAL ============ */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #999;
-        }
-
-        /* ============ ALERTS ============ */
-        .alert {
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid;
-        }
-
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border-left-color: #0c5460;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border-left-color: #155724;
-        }
-
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border-left-color: #856404;
-        }
-
-        /* ============ UTILITIES ============ */
-        .hidden {
-            display: none !important;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .text-muted {
-            color: #999;
-        }
-
-        .announcement-card {
-            padding: 15px;
-            border-left: 4px solid #667eea;
-            background: #f9f9f9;
-            margin-bottom: 10px;
-            border-radius: 4px;
-        }
-
-        .announcement-title {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .announcement-message {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 8px;
-        }
-
-        .announcement-date {
-            font-size: 11px;
-            color: #999;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-            }
-
-            .app-container {
-                flex-direction: column;
-            }
-
-            .main-content {
-                padding: 15px;
-            }
-
-            .topbar {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        .screen-area { flex-grow: 1; display: flex; flex-direction: column; align-items: center; }
+        .bezel { 
+            width: 100%; max-width: 320px; height: 220px; background: #7f8c8d; 
+            border-radius: 10px; display: flex; justify-content: center; align-items: center; 
+            box-shadow: inset 0 0 20px #000; border: 4px solid #000; padding: 5px;
+            box-sizing: border-box;
+        }
+        .screen { 
+            width: 100%; height: 100%; background-color: var(--lcd-bg); 
+            position: relative; overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        /* Fixed Layers: Camera and Gallery are now on top of everything when active */
+        #cam-layer, #gal-layer { 
+            position: absolute; top:0; left:0; width:100%; height:100%; 
+            display:none; z-index: 50; background: var(--lcd-bg);
+        }
+        video, img { width:100%; height:100%; object-fit:cover; transition: transform 0.2s; }
+
+        /* Filter Classes */
+        .f0_Nokia { filter: grayscale(100%) sepia(100%) hue-rotate(60deg) contrast(140%); }
+        .f1_BW    { filter: grayscale(100%) contrast(160%); }
+        .f2_Sepia { filter: sepia(100%) contrast(120%); }
+
+        /* UI Overlays */
+        .top-info { 
+            display: flex; justify-content: space-between; font-size: 10px; 
+            padding: 4px; z-index: 100; color: #000; font-weight: bold;
+            background: rgba(148, 180, 148, 0.6); /* Semi-transparent bar */
+        }
+        .ui-center { 
+            flex-grow: 1; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 10; 
+            color: #000; text-align: center; font-size: 14px;
+        }
+        .footer { 
+            font-size: 12px; text-align: center; border-top: 1px solid #000; 
+            z-index: 100; padding: 3px 0; color: #000; font-weight: bold;
+            background: rgba(148, 180, 148, 0.6);
+        }
+
+        .controls-right { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-left: 15px; }
+        .p-btn {
+            width: 65px; height: 50px; background: var(--btn-plastic); border: none;
+            border-radius: 10px; color: white; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px #2d3436; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px;
+        }
+        .p-btn:active { transform: translateY(2px); box-shadow: 0 2px #2d3436; }
+        .p-btn.red { background: var(--rec-red); box-shadow: 0 4px #822222; }
+
+        #filter-indicator {
+            position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
+            font-size: 10px; color: #fff; background: #000; padding: 2px 8px; border-radius: 10px; z-index: 200; display:none;
+        }
+        .rec-active { color: var(--rec-red); animation: pulse 1s infinite; display: none; }
+        @keyframes pulse { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-<!-- ============ LOGIN PAGE ============ -->
-<div id="loginPage" class="login-container">
-    <div class="login-box">
-        <div class="login-header">
-            <div class="company-logo">🏢</div>
-            <h1>AMK Advisory</h1>
-            <p>HR Management System</p>
+<div class="action-body">
+    <div class="screen-area">
+        <div id="filter-indicator">NOKIA GREEN</div>
+        <div class="bezel">
+            <div class="screen">
+                <div class="top-info">
+                    <span>||||</span> <span id="clock">00:00</span> <span id="rec-status" class="rec-active">●REC</span> <span>||||</span>
+                </div>
+
+                <div id="cam-layer"><video id="preview" autoplay playsinline muted></video></div>
+                
+                <div id="gal-layer">
+                    <img id="gal-img" style="display:none;">
+                    <video id="gal-vid" style="display:none;" loop muted playsinline></video>
+                </div>
+
+                <div class="ui-center" id="ui-main">NOKIA<br>ACTION</div>
+
+                <div class="footer" id="ui-footer">MENU</div>
+            </div>
         </div>
+    </div>
 
-        <form id="loginForm" onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Enter username" required>
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter password" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
+    <div class="controls-right">
+        <button class="p-btn" style="background:#d35400" onclick="cycleFilter()"><span>☼</span>FLTR</button>
+        <button class="p-btn" onclick="navStep(-1)"><span>▲</span>UP</button>
+        <button class="p-btn red" onclick="pressAction()"><span>OK</span>ACT</button>
+        <button class="p-btn" onclick="navStep(1)"><span>▼</span>DOWN</button>
+        <button class="p-btn" onclick="zoomReset()"><span>0</span>1.0x</button>
+        <button class="p-btn" onclick="pressBack()"><span>←</span>BACK</button>
     </div>
 </div>
 
-<!-- ============ MAIN APPLICATION ============ -->
-<div id="appContainer" class="app-container">
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo">🏢</div>
-            <div class="sidebar-title">AMK</div>
-        </div>
-
-        <div class="user-info">
-            <div class="name" id="userName">User</div>
-            <div class="role" id="userRole">Employee</div>
-        </div>
-
-        <div id="adminPasswordBtn" style="display: none; margin-bottom: 20px;">
-            <button class="btn btn-secondary" style="width: 90%; padding: 10px;" onclick="openModal('changePasswordModal')">🔐 Change Password</button>
-        </div>
-
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a class="nav-link active" onclick="openPage('dashboard', event)">📊 Dashboard</a>
-            </li>
-            <li class="nav-item" id="employeesNav" style="display: none;">
-                <a class="nav-link" onclick="openPage('employees', event)">👥 Employees/Users</a>
-            </li>
-            <li class="nav-item" id="requestsNav" style="display: none;">
-                <a class="nav-link" onclick="openPage('requests', event)">📋 Pending Requests</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="openPage('leaves', event)">📝 Leave Application</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="openPage('attendance', event)">✓ Attendance</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="openPage('announcements', event)">📢 Announcements</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="openPage('policies', event)">📄 Policies</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="openPage('holidays', event)">🗓️ Holidays</a>
-            </li>
-            <li class="nav-item" id="settingsNav" style="display: none;">
-                <a class="nav-link" onclick="openPage('settings', event)">⚙️ Settings</a>
-            </li>
-
-            <li class="nav-item logout-btn">
-                <a class="nav-link" onclick="handleLogout()">🚪 Logout</a>
-            </li>
-        </ul>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-        <!-- TOPBAR -->
-        <div class="topbar">
-            <h1 class="page-title" id="pageTitle">Dashboard</h1>
-            <div class="topbar-actions">
-                <div class="notification-bell" onclick="showNotifications()">
-                    🔔
-                    <span class="notification-badge" id="notificationCount" style="display: none;">0</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- DASHBOARD PAGE -->
-        <div id="dashboardPage" class="page-content active">
-            <div class="alert alert-info">
-                📅 Today: <strong id="todayDate"></strong>
-            </div>
-
-            <div class="grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="totalEmployees">0</div>
-                    <div class="stat-label">Total Employees</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="todayPresent">0</div>
-                    <div class="stat-label">Present Today</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="pendingLeaves">0</div>
-                    <div class="stat-label">Pending Leaves</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">📢 Recent Announcements</div>
-                <div id="dashboardAnnouncements">
-                    <p class="text-muted">No announcements yet</p>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">🗓️ Upcoming Holidays</div>
-                <div id="dashboardHolidays">
-                    <p class="text-muted">Loading holidays...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- EMPLOYEES PAGE -->
-        <div id="employeesPage" class="page-content">
-            <div class="card">
-                <div class="card-title">Employee & User Directory</div>
-                <button class="btn btn-secondary" onclick="openModal('addEmployeeModal')" style="margin-bottom: 20px;">➕ Add Employee with Login</button>
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Username</th>
-                                <th>Department</th>
-                                <th>Position</th>
-                                <th>Email</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="employeesTable">
-                            <tr><td colspan="6" class="text-center text-muted">No employees</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- LEAVE APPLICATION PAGE -->
-        <div id="leavesPage" class="page-content">
-            <div class="card">
-                <div class="card-title">Apply for Leave</div>
-                <form onsubmit="submitLeave(event)">
-                    <div class="form-section">
-                        <div class="form-group">
-                            <label>From Date</label>
-                            <input type="date" id="leaveFromDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label>To Date</label>
-                            <input type="date" id="leaveToDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Leave Type</label>
-                            <select id="leaveType" required>
-                                <option value="">-- Select --</option>
-                                <option value="sick">Sick Leave</option>
-                                <option value="casual">Casual Leave</option>
-                                <option value="annual">Annual Leave</option>
-                                <option value="personal">Personal Leave</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Reason</label>
-                            <textarea id="leaveReason" required></textarea>
-                        </div>
-                        <div class="btn-group">
-                            <button type="reset" class="btn btn-secondary">Reset</button>
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <div class="card">
-                <div class="card-title">My Leave Applications</div>
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>From</th>
-                                <th>To</th>
-                                <th>Type</th>
-                                <th>Reason</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaveTable">
-                            <tr><td colspan="5" class="text-center text-muted">No leave applications</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ATTENDANCE PAGE -->
-        <div id="attendancePage" class="page-content">
-            <div class="card">
-                <div class="card-title">My Attendance</div>
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Check-in Time</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendanceTable">
-                            <tr><td colspan="3" class="text-center text-muted">No records</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ANNOUNCEMENTS PAGE -->
-        <div id="announcementsPage" class="page-content">
-            <button class="btn btn-secondary" onclick="openModal('addAnnouncementModal')" style="margin-bottom: 20px; display: none;" id="addAnnouncementBtn">➕ Add Announcement</button>
-            <div id="announcementsList"></div>
-        </div>
-
-        <!-- POLICIES PAGE -->
-        <div id="policiesPage" class="page-content">
-            <button class="btn btn-secondary" onclick="openModal('addPolicyModal')" style="margin-bottom: 20px; display: none;" id="addPolicyBtn">➕ Add Policy</button>
-            <div class="card">
-                <div class="card-title">Company Policies</div>
-                <div id="policiesList">
-                    <p class="text-muted">No policies available</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- HOLIDAYS PAGE -->
-        <div id="holidaysPage" class="page-content">
-            <div class="card">
-                <div class="card-title">Holiday Calendar 2026 - Bangladesh</div>
-                <div id="holidaysList"></div>
-            </div>
-        </div>
-
-        <!-- REQUESTS PAGE (Admin/HR) -->
-        <div id="requestsPage" class="page-content">
-            <div class="card">
-                <div class="card-title">⏳ Pending Leave Requests</div>
-                <div id="leaveRequestsList" style="max-height: 600px; overflow-y: auto;">
-                    <p class="text-muted">No pending leave requests</p>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">🚨 Pending Late Login Requests</div>
-                <div id="lateLoginRequestsList" style="max-height: 600px; overflow-y: auto;">
-                    <p class="text-muted">No pending late login requests</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- REQUESTS PAGE (Admin/HR) -->
-        <div id="requestsPage" class="page-content">
-            <div class="card">
-                <div class="card-title">⏳ Pending Leave Requests</div>
-                <div id="leaveRequestsList" style="max-height: 600px; overflow-y: auto;">
-                    <p class="text-muted">No pending leave requests</p>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">🚨 Pending Late Login Requests</div>
-                <div id="lateLoginRequestsList" style="max-height: 600px; overflow-y: auto;">
-                    <p class="text-muted">No pending late login requests</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SETTINGS PAGE -->
-        <div id="settingsPage" class="page-content">
-            <div class="card">
-                <div class="card-title">User Management</div>
-                <button class="btn btn-secondary" onclick="openModal('addUserModal')" style="margin-bottom: 20px;">➕ Add User</button>
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Name</th>
-                                <th>Role</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersTable">
-                            <tr><td colspan="4" class="text-center text-muted">No users</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="card" id="attendanceStatsCard" style="display: none;">
-                <div class="card-title">📊 Attendance Statistics</div>
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Employee Name</th>
-                                <th>Present</th>
-                                <th>Absent</th>
-                                <th>Pending</th>
-                                <th>Total Days</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendanceStatsTable">
-                            <tr><td colspan="5" class="text-center text-muted">Loading...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title" style="color: #e74c3c;">🔄 System Reset</div>
-                <p style="color: #666; margin-bottom: 15px;">Clear all dashboard data, activities, and users. Reset to fresh website.</p>
-                <button class="btn btn-secondary" style="background: #e74c3c; color: white;" onclick="openModal('resetSystemModal')">⚠️ Reset System</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ============ MODALS ============ -->
-<div id="addUserModal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close" onclick="closeModal('addUserModal')">✕</span>
-        <div class="modal-header">Create New User</div>
-        <form onsubmit="createUser(event)">
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="newUserName" required>
-            </div>
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="newUsername" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="newUserPassword" required minlength="4">
-            </div>
-            <div class="form-group">
-                <label>Role</label>
-                <select id="newUserRole" required>
-                    <option value="employee">Employee</option>
-                    <option value="hr">HR Manager</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </div>
-            <div class="btn-group">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div id="addAnnouncementModal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close" onclick="closeModal('addAnnouncementModal')">✕</span>
-        <div class="modal-header">Add Announcement</div>
-        <form onsubmit="createAnnouncement(event)">
-            <div class="form-group">
-                <label>Title</label>
-                <input type="text" id="announcementTitle" required>
-            </div>
-            <div class="form-group">
-                <label>Message</label>
-                <textarea id="announcementMessage" required></textarea>
-            </div>
-            <div class="btn-group">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('addAnnouncementModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Post</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div id="addPolicyModal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close" onclick="closeModal('addPolicyModal')">✕</span>
-        <div class="modal-header">Add Policy</div>
-        <form onsubmit="createPolicy(event)">
-            <div class="form-group">
-                <label>Title</label>
-                <input type="text" id="policyTitle" required>
-            </div>
-            <div class="form-group">
-                <label>Description</label>
-                <textarea id="policyDescription" required></textarea>
-            </div>
-            <div class="btn-group">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('addPolicyModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div id="addEmployeeModal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close" onclick="closeModal('addEmployeeModal')">✕</span>
-        <div class="modal-header">Add Employee with Login Credentials</div>
-        <form onsubmit="createEmployee(event)">
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="employeeName" required>
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="employeeEmail" required>
-            </div>
-            <div class="form-group">
-                <label>Department</label>
-                <input type="text" id="employeeDepartment" required>
-            </div>
-            <div class="form-group">
-                <label>Position</label>
-                <input type="text" id="employeePosition" required>
-            </div>
-            <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
-            <div style="font-weight: 600; margin-bottom: 15px; color: #333;">Login Credentials</div>
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="employeeUsername" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="employeePassword" required minlength="4">
-            </div>
-            <div class="form-group">
-                <label>Confirm Password</label>
-                <input type="password" id="employeePasswordConfirm" required minlength="4">
-            </div>
-            <div class="form-group">
-                <label>Role</label>
-                <select id="employeeRole" required>
-                    <option value="employee">Employee</option>
-                    <option value="hr">HR Manager</option>
-                </select>
-            </div>
-            <div class="btn-group">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('addEmployeeModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add Employee</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div id="notificationsModal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close" onclick="closeModal('notificationsModal')">✕</span>
-        <div class="modal-header">Notifications</div>
-        <div id="notificationsList" style="max-height: 400px; overflow-y: auto;">
-            <p class="text-muted">No notifications</p>
-        </div>
-    </div>
-</div>
-
-<div id="changePasswordModal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close" onclick="closeModal('changePasswordModal')">✕</span>
-        <div class="modal-header">Change Password</div>
-        <form onsubmit="changeAdminPassword(event)">
-            <div class="form-group">
-                <label>Current Password</label>
-                <input type="password" id="currentPassword" required>
-            </div>
-            <div class="form-group">
-                <label>New Password</label>
-                <input type="password" id="newPassword" required minlength="4">
-            </div>
-            <div class="form-group">
-                <label>Confirm New Password</label>
-                <input type="password" id="confirmNewPassword" required minlength="4">
-            </div>
-            <div class="btn-group">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('changePasswordModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Change Password</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div id="resetSystemModal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close" onclick="closeModal('resetSystemModal')">✕</span>
-        <div class="modal-header" style="color: #e74c3c;">⚠️ System Reset - Confirm</div>
-        <p style="color: #e74c3c; margin-bottom: 20px; font-weight: 600;">WARNING: This will erase ALL data including employees, leaves, attendance, announcements, and all activities. This action cannot be undone!</p>
-        <p style="color: #666; margin-bottom: 20px;">To confirm this action, enter your admin password TWO TIMES:</p>
-        <form onsubmit="confirmSystemReset(event)">
-            <div class="form-group">
-                <label>Admin Password (First Time)</label>
-                <input type="password" id="resetPassword1" required minlength="4" placeholder="Enter your password">
-            </div>
-            <div class="form-group">
-                <label>Admin Password (Second Time - Confirm)</label>
-                <input type="password" id="resetPassword2" required minlength="4" placeholder="Enter your password again">
-            </div>
-            <div class="btn-group">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('resetSystemModal')">Cancel</button>
-                <button type="submit" class="btn btn-secondary" style="background: #e74c3c;">Reset System</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div id="lateLoginModal" class="modal" data-no-close="true">
-    <div class="modal-content">
-        <div class="modal-header">⚠️ Late Login Detected</div>
-        <p style="color: #666; margin-bottom: 20px;">You logged in after 9:30 AM. Please provide a reason for your late arrival:</p>
-        <form onsubmit="submitLateLoginReason(event)">
-            <div class="form-group" style="display: none;">
-                <input type="text" id="lateLoginUsername" value="">
-            </div>
-            <div class="form-group" style="display: none;">
-                <input type="text" id="lateLoginDate" value="">
-            </div>
-            <div class="form-group" style="display: none;">
-                <input type="text" id="lateLoginTime" value="">
-            </div>
-            <div class="form-group">
-                <label>Delay Reason</label>
-                <textarea id="delayReason" required placeholder="Please explain the reason for your late arrival..."></textarea>
-            </div>
-            <div class="btn-group">
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-        </form>
-    </div>
-</div>
+<canvas id="export-buffer" width="640" height="480" style="display:none;"></canvas>
 
 <script>
-// ============ DATABASE ============
-const DB = {
-    init() {
-        if (!localStorage.getItem('users')) {
-            localStorage.setItem('users', JSON.stringify([
-                { id: 'U001', username: 'amkadvisory', password: 'amk123', role: 'admin', name: 'Administrator' }
-            ]));
-        }
-        ['leaves', 'announcements', 'attendance', 'employees', 'policies', 'notifications', 'late_logins', 'leave_notifications'].forEach(key => {
-            if (!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify([]));
-        });
-    },
+    let state = "HOME";
+    const filters = [
+        {name: "Nokia Green", class: "f0_Nokia"},
+        {name: "Classic B&W", class: "f1_BW"},
+        {name: "Vintage Sepia", class: "f2_Sepia"}
+    ];
+    let filterIdx = 0, zoom = 1.0, photos = [], stream = null, recorder = null, chunks = [];
+    let menuIdx = 0, galleryIdx = 0;
+    const menus = ["PHOTO MODE", "VIDEO MODE", "GALLERY"];
 
-    get(key) {
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : null;
-    },
+    const uiMain = document.getElementById("ui-main"), uiFooter = document.getElementById("ui-footer");
+    const camLayer = document.getElementById("cam-layer"), galLayer = document.getElementById("gal-layer");
+    const videoPreview = document.getElementById("preview"), fltrInd = document.getElementById("filter-indicator");
+    const buffer = document.getElementById("export-buffer");
 
-    save(key, data) {
-        localStorage.setItem(key, JSON.stringify(data));
-    },
-
-    add(key, item) {
-        let data = this.get(key) || [];
-        data.push(item);
-        this.save(key, data);
-    }
-};
-
-// ============ GLOBAL VARIABLES ============
-let currentUser = null;
-let currentRole = null;
-let currentUserName = null;
-
-// Bangladesh Holidays 2026
-const BD_HOLIDAYS = [
-    { date: '2026-01-26', name: '🎊 Republic Day' },
-    { date: '2026-02-21', name: '📚 International Mother Language Day' },
-    { date: '2026-03-17', name: '🌿 Mujib Year Anniversary' },
-    { date: '2026-03-26', name: '🇧🇩 Independence Day' },
-    { date: '2026-04-14', name: '🎉 Bengali New Year' },
-    { date: '2026-04-15', name: '🎨 Pohela Boishakh' },
-    { date: '2026-05-01', name: '👷 Labour Day' },
-    { date: '2026-08-15', name: '💔 National Mourning Day' },
-    { date: '2026-12-16', name: '🎖️ Victory Day' },
-    { date: '2026-12-25', name: '🎄 Christmas Day' }
-];
-
-// ============ AUTHENTICATION ============
-function handleLogin(event) {
-    event.preventDefault();
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
-    const users = DB.get('users') || [];
-    const user = users.find(u => u.username === username && u.password === password);
-
-    if (user) {
-        currentUser = username;
-        currentRole = user.role;
-        currentUserName = user.name;
-
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('appContainer').classList.add('active');
-
-        // Reset all pages to hidden state
-        document.querySelectorAll('.page-content').forEach(p => {
-            p.classList.remove('active');
-        });
-        document.querySelectorAll('.nav-link').forEach(l => {
-            l.classList.remove('active');
-        });
-
-        // Show dashboard as default page
-        const dashboardPage = document.getElementById('dashboardPage');
-        if (dashboardPage) dashboardPage.classList.add('active');
-
-        document.getElementById('userName').textContent = currentUserName;
-        document.getElementById('userRole').textContent = currentRole.charAt(0).toUpperCase() + currentRole.slice(1);
-
-        // Check if login is late (after 9:30 AM)
-        const loginTime = new Date();
-        const loginHour = loginTime.getHours();
-        const loginMinute = loginTime.getMinutes();
-        const isLate = loginHour > 9 || (loginHour === 9 && loginMinute > 30);
-
-        // Auto-mark attendance and handle late login
-        const today = new Date().toISOString().split('T')[0];
-        let attendance = DB.get('attendance') || [];
-        if (!attendance.some(a => a.username === currentUser && a.date === today)) {
-            if (isLate && currentRole === 'employee') {
-                // Show late login modal for employee
-                document.getElementById('lateLoginUsername').value = username;
-                document.getElementById('lateLoginDate').value = today;
-                document.getElementById('lateLoginTime').value = loginTime.toLocaleTimeString();
-                openModal('lateLoginModal');
-            } else {
-                // Mark as present immediately
-                attendance.push({
-                    username: currentUser,
-                    date: today,
-                    checkIn: loginTime.toLocaleTimeString(),
-                    status: 'Present'
-                });
-                DB.save('attendance', attendance);
-            }
-        }
-
-        updateDashboard();
-        loadNavigationByRole();
-        showNotificationBadge();
-    } else {
-        alert('Invalid credentials');
-    }
-}
-
-function handleLogout() {
-    currentUser = null;
-    currentRole = null;
-    currentUserName = null;
-    
-    // Hide all page content and clear active states
-    document.querySelectorAll('.page-content').forEach(p => {
-        p.classList.remove('active');
-    });
-    document.querySelectorAll('.nav-link').forEach(l => {
-        l.classList.remove('active');
-    });
-    
-    // Hide all notification badges
-    document.querySelectorAll('[id$="Badge"]').forEach(b => {
-        b.style.display = 'none';
-    });
-    
-    // Clear all form inputs in the app
-    document.querySelectorAll('input, textarea, select').forEach(input => {
-        if (input.id !== 'username' && input.id !== 'password') {
-            input.value = '';
-        }
-    });
-    
-    // Show login page and hide app container
-    document.getElementById('appContainer').classList.remove('active');
-    document.getElementById('loginPage').style.display = 'flex';
-    document.getElementById('loginForm').reset();
-    document.getElementById('dashboard').classList.add('active');
-}
-
-function loadNavigationByRole() {
-    const isAdmin = currentRole === 'admin';
-    const isHR = currentRole === 'hr';
-    
-    document.getElementById('employeesNav').style.display = (isAdmin || isHR) ? 'block' : 'none';
-    document.getElementById('requestsNav').style.display = (isAdmin || isHR) ? 'block' : 'none';
-    document.getElementById('settingsNav').style.display = isAdmin ? 'block' : 'none';
-    document.getElementById('adminPasswordBtn').style.display = isAdmin ? 'block' : 'none';
-    
-    document.getElementById('addAnnouncementBtn').style.display = isAdmin ? 'block' : 'none';
-    document.getElementById('addPolicyBtn').style.display = isAdmin ? 'block' : 'none';
-}
-
-// ============ PAGE NAVIGATION ============
-function openPage(page, event) {
-    if (event) event.preventDefault();
-
-    // Check employee access restriction
-    if (currentRole === 'employee') {
-        const allowedPages = ['dashboard', 'leaves', 'attendance', 'announcements', 'policies', 'holidays'];
-        if (!allowedPages.includes(page)) {
-            alert('Access denied');
-            return;
-        }
-    }
-
-    // Hide all pages
-    document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-
-    // Show selected page
-    const pageElement = document.getElementById(page + 'Page');
-    if (pageElement) {
-        pageElement.classList.add('active');
-        if (event?.target) event.target.classList.add('active');
-    }
-
-    // Update page title
-    const titles = {
-        dashboard: 'Dashboard',
-        employees: 'Employee Directory',
-        leaves: 'Leave Application',
-        attendance: 'Attendance',
-        announcements: 'Announcements',
-        policies: 'Company Policies',
-        holidays: 'Holiday Calendar',
-        settings: 'Settings',
-        requests: 'Pending Requests'
-    };
-    document.getElementById('pageTitle').textContent = titles[page] || 'Page';
-
-    // Load page data
-    if (page === 'employees') loadEmployees();
-    if (page === 'leaves') loadLeaves();
-    if (page === 'attendance') loadAttendance();
-    if (page === 'announcements') loadAnnouncements();
-    if (page === 'policies') loadPolicies();
-    if (page === 'holidays') loadHolidays();
-    if (page === 'settings') loadUsers();
-    if (page === 'requests') { loadLeaveRequests(); loadLateLoginRequests(); }
-}
-
-// ============ DASHBOARD ============
-function updateDashboard() {
-    const today = new Date();
-    document.getElementById('todayDate').textContent = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-    const employees = DB.get('employees') || [];
-    document.getElementById('totalEmployees').textContent = employees.length;
-
-    const todayStr = today.toISOString().split('T')[0];
-    const attendance = DB.get('attendance') || [];
-    const todayAttendance = attendance.filter(a => a.date === todayStr).length;
-    document.getElementById('todayPresent').textContent = todayAttendance;
-
-    const leaves = DB.get('leaves') || [];
-    const pendingLeaves = leaves.filter(l => l.status === 'Pending').length;
-    document.getElementById('pendingLeaves').textContent = pendingLeaves;
-
-    // Recent announcements
-    const announcements = DB.get('announcements') || [];
-    const recentAnnouncements = announcements.slice(-3).reverse();
-    const announcementsHTML = recentAnnouncements.length > 0
-        ? recentAnnouncements.map(a => `
-            <div class="announcement-card">
-                <div class="announcement-title">${a.title}</div>
-                <div class="announcement-message">${a.message}</div>
-                <div class="announcement-date">Posted: ${a.date}</div>
-            </div>
-        `).join('')
-        : '<p class="text-muted">No announcements</p>';
-    document.getElementById('dashboardAnnouncements').innerHTML = announcementsHTML;
-
-    // Upcoming holidays
-    const upcomingHolidays = BD_HOLIDAYS.filter(h => new Date(h.date) >= today).slice(0, 5);
-    const holidaysHTML = upcomingHolidays.length > 0
-        ? upcomingHolidays.map(h => {
-            const hDate = new Date(h.date);
-            return `
-            <div class="announcement-card">
-                <div class="announcement-title">${h.name}</div>
-                <div class="announcement-date">${hDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-            </div>
-        `;
-        }).join('')
-        : '<p class="text-muted">No upcoming holidays</p>';
-    document.getElementById('dashboardHolidays').innerHTML = holidaysHTML;
-}
-
-// ============ ANNOUNCEMENTS ============
-function loadAnnouncements() {
-    const announcements = DB.get('announcements') || [];
-    const html = announcements.length > 0
-        ? announcements.map((a, i) => `
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: start;">
-                    <div style="flex: 1;">
-                        <div class="card-title">${a.title}</div>
-                        <p style="color: #666;">${a.message}</p>
-                        <p style="font-size: 12px; color: #999; margin-top: 10px;">Posted: ${a.date}</p>
-                    </div>
-                    ${currentRole === 'admin' ? `<button class="btn btn-secondary" onclick="deleteAnnouncement(${i})">Delete</button>` : ''}
-                </div>
-            </div>
-        `).join('')
-        : '<div class="card"><p class="text-muted">No announcements</p></div>';
-
-    document.getElementById('announcementsList').innerHTML = html;
-}
-
-function createAnnouncement(event) {
-    event.preventDefault();
-    const announcement = {
-        title: document.getElementById('announcementTitle').value,
-        message: document.getElementById('announcementMessage').value,
-        date: new Date().toLocaleDateString(),
-        read: false
-    };
-    DB.add('announcements', announcement);
-    alert('Announcement posted!');
-    closeModal('addAnnouncementModal');
-    loadAnnouncements();
-    updateDashboard();
-    showNotificationBadge();
-    event.target.reset();
-}
-
-function deleteAnnouncement(index) {
-    if (confirm('Delete this announcement?')) {
-        let announcements = DB.get('announcements') || [];
-        announcements.splice(index, 1);
-        DB.save('announcements', announcements);
-        loadAnnouncements();
-        updateDashboard();
-    }
-}
-
-// ============ HOLIDAYS ============
-function loadHolidays() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const upcomingHolidays = BD_HOLIDAYS.filter(h => new Date(h.date) >= today);
-    const html = upcomingHolidays.length > 0 ? upcomingHolidays.map(h => {
-        const date = new Date(h.date);
-        return `
-            <div class="announcement-card">
-                <div class="announcement-title">${h.name}</div>
-                <div class="announcement-date">${date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-            </div>
-        `;
-    }).join('') : '<p class="text-muted">No upcoming holidays</p>';
-    document.getElementById('holidaysList').innerHTML = html;
-}
-
-// ============ LEAVES ============
-function submitLeave(event) {
-    event.preventDefault();
-    const fromDate = new Date(document.getElementById('leaveFromDate').value);
-    const toDate = new Date(document.getElementById('leaveToDate').value);
-    const daysDiff = Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1;
-    
-    const leave = {
-        id: 'L' + Date.now(),
-        username: currentUser,
-        fromDate: document.getElementById('leaveFromDate').value,
-        toDate: document.getElementById('leaveToDate').value,
-        days: daysDiff,
-        type: document.getElementById('leaveType').value,
-        reason: document.getElementById('leaveReason').value,
-        status: 'Pending',
-        date: new Date().toLocaleDateString()
-    };
-    DB.add('leaves', leave);
-    
-    // Add notification for admin/hr
-    const notification = {
-        id: 'N' + Date.now(),
-        type: 'leave_request',
-        username: currentUser,
-        leaveId: leave.id,
-        message: `New leave request from ${currentUserName} for ${leave.days} days (${leave.fromDate} to ${leave.toDate})`,
-        date: new Date().toLocaleDateString(),
-        read: false
-    };
-    DB.add('leave_notifications', notification);
-    
-    alert('Leave application submitted and is pending approval');
-    event.target.reset();
-    loadLeaves();
-    updateDashboard();
-}
-
-function loadLeaves() {
-    const leaves = DB.get('leaves') || [];
-    const myLeaves = leaves.filter(l => l.username === currentUser);
-    
-    // Calculate leave balance
-    const approvedLeaves = myLeaves.filter(l => l.status === 'Approved');
-    const totalTaken = approvedLeaves.reduce((sum, l) => sum + (l.days || 1), 0);
-    const totalBalance = 20; // Default annual balance
-    const remaining = totalBalance - totalTaken;
-    
-    // Add balance info
-    const balanceHTML = `
-        <div style="background: #f0f0f0; padding: 15px; margin-bottom: 20px; border-radius: 8px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-            <div style="text-align: center;">
-                <div style="font-size: 24px; font-weight: bold; color: #667eea;">${totalBalance}</div>
-                <div style="font-size: 12px; color: #666;">Total Balance</div>
-            </div>
-            <div style="text-align: center;">
-                <div style="font-size: 24px; font-weight: bold; color: #e74c3c;">${totalTaken}</div>
-                <div style="font-size: 12px; color: #666;">Days Used</div>
-            </div>
-            <div style="text-align: center;">
-                <div style="font-size: 24px; font-weight: bold; color: #27ae60;">${remaining}</div>
-                <div style="font-size: 12px; color: #666;">Remaining</div>
-            </div>
-        </div>
-    `;
-    
-    const html = myLeaves.length > 0
-        ? balanceHTML + myLeaves.map(l => `
-            <tr>
-                <td>${l.fromDate}</td>
-                <td>${l.toDate}</td>
-                <td>${l.days} days</td>
-                <td>${l.type}</td>
-                <td>${l.reason}</td>
-                <td><span class="badge badge-${l.status === 'Approved' ? 'success' : l.status === 'Rejected' ? 'danger' : 'warning'}">${l.status}</span></td>
-            </tr>
-        `).join('')
-        : balanceHTML + '<tr><td colspan="6" class="text-center text-muted">No leave applications</td></tr>';
-    document.getElementById('leaveTable').innerHTML = html;
-}
-
-// ============ ATTENDANCE ============
-function loadAttendance() {
-    const attendance = DB.get('attendance') || [];
-    const myAttendance = attendance.filter(a => a.username === currentUser).sort((x, y) => new Date(y.date) - new Date(x.date));
-    
-    const html = myAttendance.length > 0
-        ? myAttendance.map(a => {
-            const badgeClass = a.status === 'Present' ? 'badge-success' : a.status === 'Absent' ? 'badge-danger' : 'badge-warning';
-            const checkInDisplay = a.checkIn ? a.checkIn : '—';
-            return `
-            <tr>
-                <td>${a.date}</td>
-                <td>${checkInDisplay}</td>
-                <td><span class="badge ${badgeClass}">${a.status}</span></td>
-            </tr>
-        `;}
-        ).join('')
-        : '<tr><td colspan="3" class="text-center text-muted">No records</td></tr>';
-    document.getElementById('attendanceTable').innerHTML = html;
-}
-
-// ============ EMPLOYEES ============
-function loadEmployees() {
-    const employees = DB.get('employees') || [];
-    const html = employees.length > 0
-        ? employees.map((e, i) => `
-            <tr>
-                <td>${e.name || 'N/A'}</td>
-                <td>${e.username || 'N/A'}</td>
-                <td>${e.department || 'N/A'}</td>
-                <td>${e.position || 'N/A'}</td>
-                <td>${e.email || 'N/A'}</td>
-                <td><button class="btn btn-secondary" onclick="deleteEmployee(${i})" style="font-size: 12px; padding: 5px 10px;">Delete</button></td>
-            </tr>
-        `).join('')
-        : '<tr><td colspan="6" class="text-center text-muted">No employees</td></tr>';
-    document.getElementById('employeesTable').innerHTML = html;
-}
-
-function createEmployee(event) {
-    event.preventDefault();
-    
-    const password = document.getElementById('employeePassword').value;
-    const confirmPassword = document.getElementById('employeePasswordConfirm').value;
-    
-    if (password !== confirmPassword) {
-        alert('Passwords do not match!');
-        return;
-    }
-    
-    const username = document.getElementById('employeeUsername').value;
-    const users = DB.get('users') || [];
-    if (users.some(u => u.username === username)) {
-        alert('Username already exists!');
-        return;
-    }
-    
-    // Create employee
-    const employee = {
-        id: 'E' + Date.now(),
-        name: document.getElementById('employeeName').value,
-        email: document.getElementById('employeeEmail').value,
-        department: document.getElementById('employeeDepartment').value,
-        position: document.getElementById('employeePosition').value,
-        username: username
-    };
-    DB.add('employees', employee);
-    
-    // Create user account
-    const user = {
-        id: 'U' + Date.now(),
-        username: username,
-        password: password,
-        name: employee.name,
-        role: document.getElementById('employeeRole').value
-    };
-    DB.add('users', user);
-    
-    alert(`Employee added!\nUsername: ${username}\nPassword: ${password}`);
-    closeModal('addEmployeeModal');
-    loadEmployees();
-    loadUsers();
-    updateDashboard();
-    event.target.reset();
-}
-
-function deleteEmployee(index) {
-    if (confirm('Delete this employee and their user account?')) {
-        const employees = DB.get('employees') || [];
-        const employee = employees[index];
-        
-        // Delete employee
-        employees.splice(index, 1);
-        DB.save('employees', employees);
-        
-        // Delete associated user account
-        if (employee.username) {
-            let users = DB.get('users') || [];
-            users = users.filter(u => u.username !== employee.username);
-            DB.save('users', users);
-        }
-        
-        alert('Employee and user account deleted!');
-        loadEmployees();
-        loadUsers();
-        updateDashboard();
-    }
-}
-
-function changeAdminPassword(event) {
-    event.preventDefault();
-    
-    const currentPassword = document.getElementById('currentPassword').value;
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmNewPassword').value;
-    
-    if (newPassword !== confirmPassword) {
-        alert('New passwords do not match!');
-        return;
-    }
-    
-    const users = DB.get('users') || [];
-    const adminUser = users.find(u => u.username === currentUser);
-    
-    if (!adminUser) {
-        alert('User not found!');
-        return;
-    }
-    
-    if (adminUser.password !== currentPassword) {
-        alert('Current password is incorrect!');
-        return;
-    }
-    
-    adminUser.password = newPassword;
-    DB.save('users', users);
-    alert('Password changed successfully!');
-    closeModal('changePasswordModal');
-    event.target.reset();
-}
-
-// ============ POLICIES ============
-function loadPolicies() {
-    const policies = DB.get('policies') || [];
-    const html = policies.length > 0
-        ? policies.map((p, i) => `
-            <div class="announcement-card">
-                <div class="announcement-title">${p.title}</div>
-                <div style="font-size: 13px; color: #666; margin-top: 8px;">${p.description}</div>
-                ${currentRole === 'admin' ? `<button class="btn btn-secondary" onclick="deletePolicy(${i})" style="margin-top: 10px;">Delete</button>` : ''}
-            </div>
-        `).join('')
-        : '<p class="text-muted">No policies</p>';
-
-    document.getElementById('policiesList').innerHTML = html;
-}
-
-function createPolicy(event) {
-    event.preventDefault();
-    const policy = {
-        title: document.getElementById('policyTitle').value,
-        description: document.getElementById('policyDescription').value,
-        date: new Date().toLocaleDateString()
-    };
-    DB.add('policies', policy);
-    alert('Policy added!');
-    closeModal('addPolicyModal');
-    loadPolicies();
-    event.target.reset();
-}
-
-function deletePolicy(index) {
-    if (confirm('Delete this policy?')) {
-        let policies = DB.get('policies') || [];
-        policies.splice(index, 1);
-        DB.save('policies', policies);
-        loadPolicies();
-    }
-}
-
-// ============ LEAVE & LATE LOGIN REQUESTS (Admin/HR) ============
-function loadLeaveRequests() {
-    const leaves = DB.get('leaves') || [];
-    const pendingLeaves = leaves.filter(l => l.status === 'Pending');
-    
-    const html = pendingLeaves.length > 0
-        ? pendingLeaves.map((l, i) => {
-            const approvedLeaves = leaves.filter(x => x.username === l.username && x.status === 'Approved');
-            const totalTaken = approvedLeaves.reduce((sum, x) => sum + (x.days || 1), 0);
-            const remaining = 20 - totalTaken;
-            
-            return `
-            <div class="card" data-leave-id="${l.id}">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
-                    <div>
-                        <div class="card-title">${l.username}</div>
-                        <p style="color: #666; margin-bottom: 8px;">Type: ${l.type} | Days: ${l.days}</p>
-                        <p style="color: #666; margin-bottom: 8px;">From: ${l.fromDate} To: ${l.toDate}</p>
-                        <p style="font-size: 12px; color: #999;">Reason: ${l.reason}</p>
-                        <p style="font-size: 12px; color: #999; margin-top: 8px;">Remaining Balance: ${remaining} days</p>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-primary approve-leave-btn" data-id="${l.id}">Approve</button>
-                    <button class="btn btn-secondary reject-leave-btn" data-id="${l.id}">Reject</button>
-                </div>
-            </div>
-        `;
-        }).join('')
-        : '<p class="text-muted">No pending leave requests</p>';
-    
-    document.getElementById('leaveRequestsList').innerHTML = html;
-    
-    // Attach event listeners to avoid inline onclick issues
-    document.querySelectorAll('.approve-leave-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            approveLeave(this.getAttribute('data-id'));
-        });
-    });
-    document.querySelectorAll('.reject-leave-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            rejectLeave(this.getAttribute('data-id'));
-        });
-    });
-}
-
-function approveLeave(leaveId) {
-    if (confirm('Approve this leave request?')) {
+    function beep(f=800, d=50) {
         try {
-            let leaves = DB.get('leaves') || [];
-            const leaveIndex = leaves.findIndex(l => l.id === leaveId);
-            
-            if (leaveIndex >= 0) {
-                const leave = leaves[leaveIndex];
-                leave.status = 'Approved';
-                leave.approvedBy = currentUser;
-                leave.approvedDate = new Date().toLocaleDateString();
-                leaves[leaveIndex] = leave;
-                DB.save('leaves', leaves);
-                
-                // Add notification for employee
-                const notification = {
-                    id: 'N' + Date.now(),
-                    type: 'leave_approved',
-                    targetUser: leave.username,
-                    message: `Your leave request from ${leave.fromDate} to ${leave.toDate} has been approved!`,
-                    date: new Date().toLocaleDateString(),
-                    read: false
-                };
-                DB.add('leave_notifications', notification);
-                
-                alert('Leave approved!');
-                loadLeaveRequests();
-                loadDashboardNotifications();
-            } else {
-                alert('Leave record not found! Check console for details.');
-                console.log('Leave ID:', leaveId, 'Available leaves:', leaves);
-            }
-        } catch (error) {
-            console.error('Error approving leave:', error);
-            alert('Error: ' + error.message);
-        }
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const o = ctx.createOscillator(); const g = ctx.createGain();
+            o.frequency.value = f; g.gain.value = 0.03; o.connect(g); g.connect(ctx.destination);
+            o.start(); setTimeout(() => o.stop(), d);
+        } catch(e){}
     }
-}
 
-function rejectLeave(leaveId) {
-    const reason = prompt('Enter rejection reason:');
-    if (reason !== null && reason.trim()) {
+    async function startCam(isVid) {
         try {
-            let leaves = DB.get('leaves') || [];
-            const leaveIndex = leaves.findIndex(l => l.id === leaveId);
+            if(stream) stream.getTracks().forEach(t => t.stop());
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            videoPreview.srcObject = stream;
+            state = isVid ? "CAMERA_VIDEO" : "CAMERA_PHOTO";
             
-            if (leaveIndex >= 0) {
-                const leave = leaves[leaveIndex];
-                leave.status = 'Rejected';
-                leave.rejectionReason = reason;
-                leave.rejectedBy = currentUser;
-                leave.rejectedDate = new Date().toLocaleDateString();
-                leaves[leaveIndex] = leave;
-                DB.save('leaves', leaves);
-                
-                // Add notification for employee
-                const notification = {
-                    id: 'N' + Date.now(),
-                    type: 'leave_rejected',
-                    targetUser: leave.username,
-                    message: `Your leave request from ${leave.fromDate} to ${leave.toDate} has been rejected. Reason: ${reason}`,
-                    date: new Date().toLocaleDateString(),
-                    read: false
-                };
-                DB.add('leave_notifications', notification);
-                
-                alert('Leave rejected!');
-                loadLeaveRequests();
-                loadDashboardNotifications();
-            } else {
-                alert('Leave record not found! Check console for details.');
-                console.log('Leave ID:', leaveId);
-            }
-        } catch (error) {
-            console.error('Error rejecting leave:', error);
-            alert('Error: ' + error.message);
-        }
-    }
-}
-
-function loadLateLoginRequests() {
-    const lateLogins = DB.get('late_logins') || [];
-    const pendingLogins = lateLogins.filter(l => l.status === 'Pending');
-    
-    const html = pendingLogins.length > 0
-        ? pendingLogins.map((l, i) => `
-            <div class="card" data-late-login-id="${l.id}">
-                <div style="margin-bottom: 15px;">
-                    <div class="card-title">${l.username}</div>
-                    <p style="color: #666; margin-bottom: 8px;">Date: ${l.date}</p>
-                    <p style="color: #666; margin-bottom: 8px;">Login Time: ${l.loginTime}</p>
-                    <p style="color: #666; margin-bottom: 8px;">Reason for Late Login:</p>
-                    <p style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 13px;">${l.reason}</p>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-primary approve-late-login-btn" data-id="${l.id}">Approve (Mark Present)</button>
-                    <button class="btn btn-secondary reject-late-login-btn" data-id="${l.id}">Reject (Mark Absent)</button>
-                </div>
-            </div>
-        `).join('')
-        : '<p class="text-muted">No pending late login requests</p>';
-    
-    document.getElementById('lateLoginRequestsList').innerHTML = html;
-    
-    // Attach event listeners
-    document.querySelectorAll('.approve-late-login-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            approveLateLogin(this.getAttribute('data-id'));
-        });
-    });
-    document.querySelectorAll('.reject-late-login-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            rejectLateLogin(this.getAttribute('data-id'));
-        });
-    });
-}
-
-function approveLateLogin(lateLoginId) {
-    if (confirm('Approve this late login and mark as Present?')) {
-        try {
-            let lateLogins = DB.get('late_logins') || [];
-            const lateLoginIndex = lateLogins.findIndex(l => l.id === lateLoginId);
+            // HIDE Menu Layer, SHOW Camera Layer
+            camLayer.style.display = "block"; 
+            galLayer.style.display = "none"; 
+            uiMain.style.visibility = "hidden"; 
+            fltrInd.style.display = "block";
             
-            if (lateLoginIndex >= 0) {
-                const lateLogin = lateLogins[lateLoginIndex];
-                lateLogin.status = 'Approved';
-                lateLogin.approvedBy = currentUser;
-                lateLogin.approvedTime = new Date().toLocaleTimeString();
-                
-                // Mark attendance as Present
-                let attendance = DB.get('attendance') || [];
-                const attendanceIndex = attendance.findIndex(a => a.username === lateLogin.username && a.date === lateLogin.date);
-                
-                if (attendanceIndex >= 0) {
-                    attendance[attendanceIndex].status = 'Present';
-                    attendance[attendanceIndex].checkIn = lateLogin.loginTime;
-                    attendance[attendanceIndex].lateApproved = true;
-                } else {
-                    attendance.push({
-                        username: lateLogin.username,
-                        date: lateLogin.date,
-                        checkIn: lateLogin.loginTime,
-                        status: 'Present',
-                        lateApproved: true
-                    });
-                }
-                
-                lateLogins[lateLoginIndex] = lateLogin;
-                DB.save('late_logins', lateLogins);
-                DB.save('attendance', attendance);
-                
-                // Add notification for employee
-                const notification = {
-                    id: 'N' + Date.now(),
-                    type: 'late_login_approved',
-                    targetUser: lateLogin.username,
-                    message: `Your late login on ${lateLogin.date} has been approved. Attendance marked as Present.`,
-                    date: new Date().toLocaleDateString(),
-                    read: false
-                };
-                DB.add('leave_notifications', notification);
-                
-                alert('Late login approved and attendance marked as Present!');
-                loadLateLoginRequests();
-                loadDashboardNotifications();
-            } else {
-                alert('Late login request not found!');
-                console.log('Late Login ID:', lateLoginId);
-            }
-        } catch (error) {
-            console.error('Error approving late login:', error);
-            alert('Error: ' + error.message);
-        }
+            updateUI();
+        } catch (e) { alert("Camera Access Denied"); }
     }
-}
 
-function rejectLateLogin(lateLoginId) {
-    if (confirm('Reject this late login and mark as Absent?')) {
-        try {
-            let lateLogins = DB.get('late_logins') || [];
-            const lateLoginIndex = lateLogins.findIndex(l => l.id === lateLoginId);
-            
-            if (lateLoginIndex >= 0) {
-                const lateLogin = lateLogins[lateLoginIndex];
-                lateLogin.status = 'Rejected';
-                lateLogin.rejectedBy = currentUser;
-                lateLogin.rejectedTime = new Date().toLocaleTimeString();
-                
-                // Mark attendance as Absent
-                let attendance = DB.get('attendance') || [];
-                const attendanceIndex = attendance.findIndex(a => a.username === lateLogin.username && a.date === lateLogin.date);
-                
-                if (attendanceIndex >= 0) {
-                    attendance[attendanceIndex].status = 'Absent';
-                } else {
-                    attendance.push({
-                        username: lateLogin.username,
-                        date: lateLogin.date,
-                        checkIn: lateLogin.loginTime,
-                        status: 'Absent',
-                        lateRejected: true
-                    });
-                }
-                
-                lateLogins[lateLoginIndex] = lateLogin;
-                DB.save('late_logins', lateLogins);
-                DB.save('attendance', attendance);
-                
-                // Add notification for employee
-                const notification = {
-                    id: 'N' + Date.now(),
-                    type: 'late_login_rejected',
-                    targetUser: lateLogin.username,
-                    message: `Your late login on ${lateLogin.date} was not approved. Attendance marked as Absent.`,
-                    date: new Date().toLocaleDateString(),
-                    read: false
-                };
-                DB.add('leave_notifications', notification);
-                
-                alert('Late login rejected and attendance marked as Absent!');
-                loadLateLoginRequests();
-                loadDashboardNotifications();
-            } else {
-                alert('Late login request not found!');
-                console.log('Late Login ID:', lateLoginId);
-            }
-        } catch (error) {
-            console.error('Error rejecting late login:', error);
-            alert('Error: ' + error.message);
+    function pressAction() {
+        beep();
+        if (state === "HOME") { state = "MENU"; updateUI(); }
+        else if (state === "MENU") {
+            if (menus[menuIdx] === "PHOTO MODE") startCam(false);
+            else if (menus[menuIdx] === "VIDEO MODE") startCam(true);
+            else if (menus[menuIdx] === "GALLERY") openGallery();
         }
+        else if (state === "CAMERA_PHOTO") capturePhoto();
+        else if (state === "CAMERA_VIDEO") toggleVideo();
     }
-}
 
-function submitLateLoginReason(event) {
-    event.preventDefault();
-    const reason = document.getElementById('delayReason').value;
-    const username = document.getElementById('lateLoginUsername').value;
-    const date = document.getElementById('lateLoginDate').value;
-    const loginTime = document.getElementById('lateLoginTime').value;
-    
-    if (!reason.trim()) {
-        alert('Please provide a reason for late login');
-        return;
+    function capturePhoto() {
+        const ctx = buffer.getContext("2d");
+        const w = buffer.width, h = buffer.height;
+        const zW = w/zoom, zH = h/zoom;
+        const sX = (w-zW)/2, sY = (h-zH)/2;
+        ctx.drawImage(videoPreview, sX, sY, zW, zH, 0, 0, w, h);
+        photos.push({type: 'img', src: buffer.toDataURL("image/jpeg"), filter: filters[filterIdx].class});
+        uiFooter.innerText = "SAVED!";
+        setTimeout(() => updateUI(), 800);
     }
-    
-    try {
-        // Save late login request
-        const lateLogin = {
-            id: 'LL' + Date.now(),
-            username: username,
-            date: date,
-            loginTime: loginTime,
-            reason: reason,
-            status: 'Pending',
-            submittedDate: new Date().toLocaleDateString()
-        };
-        DB.add('late_logins', lateLogin);
-        
-        // Add notification for admin/hr
-        const notification = {
-            id: 'N' + Date.now(),
-            type: 'late_login_request',
-            username: username,
-            lateLoginId: lateLogin.id,
-            message: `Late login request from ${currentUserName} on ${date} at ${loginTime}`,
-            date: new Date().toLocaleDateString(),
-            read: false
-        };
-        DB.add('leave_notifications', notification);
-        
-        // Mark pending attendance until approval
-        let attendance = DB.get('attendance') || [];
-        const existingIndex = attendance.findIndex(a => a.username === username && a.date === date);
-        
-        if (existingIndex >= 0) {
-            // Update existing attendance record
-            attendance[existingIndex].status = 'Pending';
-            attendance[existingIndex].checkIn = loginTime;
-            attendance[existingIndex].lateLoginId = lateLogin.id;
+
+    function toggleVideo() {
+        if (recorder && recorder.state === "recording") {
+            recorder.stop();
+            document.getElementById("rec-status").style.display = "none";
         } else {
-            // Create new attendance record
-            attendance.push({
-                username: username,
-                date: date,
-                checkIn: loginTime,
-                status: 'Pending',
-                lateLoginId: lateLogin.id
-            });
-        }
-        DB.save('attendance', attendance);
-        
-        closeModal('lateLoginModal');
-        event.target.reset();
-        
-        alert('Late login reason submitted. Waiting for admin approval.');
-        updateDashboard();
-    } catch (error) {
-        console.error('Error submitting late login reason:', error);
-        alert('Error: ' + error.message);
-    }
-}
-
-function loadDashboardNotifications() {
-    // This will be called after approving/rejecting to update any badges
-    if (currentRole === 'admin' || currentRole === 'hr') {
-        const lateLogins = DB.get('late_logins') || [];
-        const leaves = DB.get('leaves') || [];
-        const pendingLogins = lateLogins.filter(l => l.status === 'Pending').length;
-        const pendingLeaves = leaves.filter(l => l.status === 'Pending').length;
-        // Could add badge update here if needed
-    }
-}
-
-// ============ USER MANAGEMENT ============
-function createUser(event) {
-    event.preventDefault();
-    const user = {
-        id: 'U' + Date.now(),
-        username: document.getElementById('newUsername').value,
-        password: document.getElementById('newUserPassword').value,
-        name: document.getElementById('newUserName').value,
-        role: document.getElementById('newUserRole').value
-    };
-    DB.add('users', user);
-    alert('User created successfully!');
-    event.target.reset();
-    closeModal('addUserModal');
-    loadUsers();
-}
-
-function loadUsers() {
-    const users = DB.get('users') || [];
-    const html = users.map(u => `
-        <tr>
-            <td>${u.username}</td>
-            <td>${u.name}</td>
-            <td><span class="badge badge-info">${u.role}</span></td>
-            <td>${u.role !== 'admin' ? `<button class="btn btn-secondary" onclick="deleteUser('${u.username}')">Delete</button>` : '—'}</td>
-        </tr>
-    `).join('');
-    document.getElementById('usersTable').innerHTML = html || '<tr><td colspan="4" class="text-center text-muted">No users</td></tr>';
-    
-    // Show attendance stats card only for admin
-    if (currentRole === 'admin') {
-        document.getElementById('attendanceStatsCard').style.display = 'block';
-        loadAttendanceStats();
-    } else {
-        document.getElementById('attendanceStatsCard').style.display = 'none';
-    }
-}
-
-function deleteUser(username) {
-    if (confirm('Delete this user?')) {
-        let users = DB.get('users') || [];
-        users = users.filter(u => u.username !== username);
-        DB.save('users', users);
-        loadUsers();
-    }
-}
-
-function loadAttendanceStats() {
-    const users = DB.get('users') || [];
-    const attendance = DB.get('attendance') || [];
-    
-    // Get all employee and hr users
-    const employees = users.filter(u => u.role === 'employee' || u.role === 'hr');
-    
-    // Calculate stats for each employee
-    const stats = employees.map(emp => {
-        const empAttendance = attendance.filter(a => a.username === emp.username);
-        const present = empAttendance.filter(a => a.status === 'Present').length;
-        const absent = empAttendance.filter(a => a.status === 'Absent').length;
-        const pending = empAttendance.filter(a => a.status === 'Pending').length;
-        const total = empAttendance.length;
-        
-        return {
-            name: emp.name,
-            present: present,
-            absent: absent,
-            pending: pending,
-            total: total
-        };
-    });
-    
-    // Sort by name
-    stats.sort((a, b) => a.name.localeCompare(b.name));
-    
-    // Generate table HTML
-    const html = stats.length > 0 ? stats.map(s => `
-        <tr>
-            <td>${s.name}</td>
-            <td><span class="badge badge-success">${s.present}</span></td>
-            <td><span class="badge badge-danger">${s.absent}</span></td>
-            <td><span class="badge badge-warning">${s.pending}</span></td>
-            <td>${s.total}</td>
-        </tr>
-    `).join('') : '<tr><td colspan="5" class="text-center text-muted">No attendance data</td></tr>';
-    
-    document.getElementById('attendanceStatsTable').innerHTML = html;
-}
-
-function confirmSystemReset(event) {
-    event.preventDefault();
-    
-    const password1 = document.getElementById('resetPassword1').value;
-    const password2 = document.getElementById('resetPassword2').value;
-    
-    // Verify admin is logged in
-    if (currentRole !== 'admin') {
-        alert('Only admin can reset the system!');
-        return;
-    }
-    
-    // Check both passwords are provided
-    if (!password1 || !password2) {
-        alert('Please enter password in both fields!');
-        return;
-    }
-    
-    // Check both passwords match each other
-    if (password1 !== password2) {
-        alert('The two passwords do not match! Please try again.');
-        document.getElementById('resetPassword1').value = '';
-        document.getElementById('resetPassword2').value = '';
-        document.getElementById('resetPassword1').focus();
-        return;
-    }
-    
-    // Verify current admin password
-    const users = DB.get('users') || [];
-    const adminUser = users.find(u => u.username === currentUser);
-    
-    if (!adminUser) {
-        alert('Admin user not found!');
-        return;
-    }
-    
-    if (adminUser.password !== password1) {
-        alert('Incorrect admin password! System reset cancelled.');
-        document.getElementById('resetPassword1').value = '';
-        document.getElementById('resetPassword2').value = '';
-        document.getElementById('resetPassword1').focus();
-        return;
-    }
-    
-    // Final confirmation before reset
-    if (!confirm('⚠️ ARE YOU ABSOLUTELY SURE?\n\nThis will DELETE ALL DATA:\n- All employees\n- All users (except admin)\n- All leave applications\n- All attendance records\n- All announcements\n- All policies\n- All activities\n\nThis action CANNOT be undone!\n\nClick OK to proceed with reset.')) {
-        return;
-    }
-    
-    try {
-        // Clear all data except re-initialize admin
-        localStorage.clear();
-        
-        // Re-initialize with default admin account
-        localStorage.setItem('users', JSON.stringify([
-            { id: 'U001', username: 'amkadvisory', password: 'amk123', role: 'admin', name: 'Administrator' }
-        ]));
-        
-        // Initialize empty collections
-        ['leaves', 'announcements', 'attendance', 'employees', 'policies', 'notifications', 'late_logins', 'leave_notifications'].forEach(key => {
-            localStorage.setItem(key, JSON.stringify([]));
-        });
-        
-        alert('✅ System reset completed successfully!\n\nAll data has been erased and system is now fresh.\n\nYou will be logged out now.');
-        
-        // Log out and redirect to login
-        handleLogout();
-        
-    } catch (error) {
-        console.error('Error during system reset:', error);
-        alert('Error during system reset: ' + error.message);
-    }
-}
-
-// ============ NOTIFICATIONS ============
-function showNotificationBadge() {
-    const announcements = DB.get('announcements') || [];
-    const unread = announcements.filter(a => !a.read).length;
-    
-    const badge = document.getElementById('notificationCount');
-    if (unread > 0) {
-        badge.textContent = unread;
-        badge.style.display = 'flex';
-    } else {
-        badge.style.display = 'none';
-    }
-}
-
-function showNotifications() {
-    const announcements = DB.get('announcements') || [];
-    const html = announcements.length > 0
-        ? announcements.map(a => `
-            <div class="announcement-card">
-                <div class="announcement-title">${a.title}</div>
-                <div style="font-size: 13px; color: #666; margin-top: 8px;">${a.message}</div>
-                <div class="announcement-date">${a.date}</div>
-            </div>
-        `).join('')
-        : '<p class="text-muted">No notifications</p>';
-    document.getElementById('notificationsList').innerHTML = html;
-    openModal('notificationsModal');
-
-    // Mark as read
-    announcements.forEach(a => a.read = true);
-    DB.save('announcements', announcements);
-    showNotificationBadge();
-}
-
-// ============ MODAL FUNCTIONS ============
-function openModal(id) {
-    document.getElementById(id).classList.add('active');
-}
-
-function closeModal(id) {
-    // Prevent closing late login modal - must submit reason
-    if (id === 'lateLoginModal') {
-        alert('You must provide a reason for your late arrival before continuing.');
-        return;
-    }
-    document.getElementById(id).classList.remove('active');
-}
-
-// ============ PAGE INITIALIZATION ============
-window.onload = function() {
-    DB.init();
-    document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-};
-
-// Close modal when clicking outside (but not for late login modal)
-window.onclick = function(event) {
-    if (event.target.classList.contains('modal')) {
-        // Don't close late login modal - it's mandatory
-        if (event.target.id === 'lateLoginModal') {
-            alert('You must provide a reason for your late arrival before continuing.');
-            return;
-        }
-        event.target.classList.remove('active');
-    }
-};
-
-// Prevent Escape key from closing late login modal
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        const lateLoginModal = document.getElementById('lateLoginModal');
-        if (lateLoginModal && lateLoginModal.classList.contains('active')) {
-            alert('You must provide a reason for your late arrival before continuing.');
-            event.preventDefault();
+            chunks = [];
+            recorder = new MediaRecorder(stream);
+            recorder.ondataavailable = e => chunks.push(e.data);
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/mp4' });
+                photos.push({type: 'vid', src: URL.createObjectURL(blob), filter: filters[filterIdx].class});
+                uiFooter.innerText = "SAVED!";
+                setTimeout(() => updateUI(), 800);
+            };
+            recorder.start();
+            document.getElementById("rec-status").style.display = "inline";
+            uiFooter.innerText = "STOP (OK)";
         }
     }
-});
+
+    function openGallery() {
+        if (photos.length === 0) { uiMain.style.visibility = "visible"; uiMain.innerHTML = "EMPTY"; return; }
+        state = "GALLERY"; galleryIdx = photos.length - 1;
+        uiMain.style.visibility = "hidden";
+        updateGallery();
+    }
+
+    function updateGallery() {
+        camLayer.style.display = "none"; 
+        galLayer.style.display = "block";
+        const item = photos[galleryIdx];
+        const gImg = document.getElementById("gal-img"), gVid = document.getElementById("gal-vid");
+        
+        if(item.type === 'img') { gImg.src = item.src; gImg.style.display = "block"; gVid.style.display = "none"; gImg.className = item.filter; }
+        else { gVid.src = item.src; gVid.style.display = "block"; gImg.style.display = "none"; gVid.className = item.filter; gVid.play(); }
+        
+        uiFooter.innerText = `IMG ${galleryIdx + 1}/${photos.length}`;
+    }
+
+    function navStep(dir) {
+        beep(700, 20);
+        if (state === "MENU") { menuIdx = (menuIdx + dir + menus.length) % menus.length; updateUI(); }
+        else if (state.startsWith("CAMERA")) { 
+            zoom = Math.max(1, Math.min(3, zoom + (dir * -0.2))); 
+            videoPreview.style.transform = `scale(${zoom})`; 
+        }
+        else if (state === "GALLERY") { galleryIdx = (galleryIdx + dir + photos.length) % photos.length; updateGallery(); }
+    }
+
+    function cycleFilter() {
+        filterIdx = (filterIdx + 1) % filters.length;
+        videoPreview.className = filters[filterIdx].class;
+        fltrInd.innerText = filters[filterIdx].name;
+    }
+
+    function zoomReset() { zoom = 1.0; videoPreview.style.transform = "scale(1)"; }
+
+    function pressBack() {
+        if(stream) stream.getTracks().forEach(t => t.stop());
+        state = "HOME"; 
+        camLayer.style.display = "none"; 
+        galLayer.style.display = "none"; 
+        fltrInd.style.display = "none";
+        uiMain.style.visibility = "visible";
+        updateUI();
+    }
+
+    function updateUI() {
+        if (state === "HOME") { 
+            uiMain.style.visibility = "visible"; 
+            uiMain.innerHTML = "NOKIA<br>ACTION"; 
+            uiFooter.innerText = "MENU"; 
+        }
+        else if (state === "MENU") { 
+            uiMain.style.visibility = "visible"; 
+            uiMain.innerHTML = `📂<br>${menus[menuIdx]}`; 
+            uiFooter.innerText = "SELECT (OK)"; 
+        }
+        else if (state.startsWith("CAMERA")) { 
+            uiFooter.innerText = state === "CAMERA_PHOTO" ? "CAPTURE (OK)" : "REC (OK)"; 
+        }
+    }
+
+    setInterval(() => {
+        const d = new Date(); document.getElementById('clock').innerText = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
+    }, 1000);
+
+    updateUI();
 </script>
-
 </body>
 </html>
