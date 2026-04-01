@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nokia ActionCam: Export</title>
+    <title>Nokia ActionCam: Retro Pro</title>
     <style>
         :root {
-            --lcd-bg: #94b494; --lcd-text: #1a1e16;
-            --case-finish: #2d3436; --btn-plastic: #636e72; --rec-red: #d63031;
+            --lcd-bg: #94b494; --case-finish: #2d3436; --btn-plastic: #636e72; --rec-red: #d63031;
         }
 
         body { 
@@ -36,10 +35,11 @@
             position: relative; overflow: hidden; display: flex; flex-direction: column;
         }
 
+        /* Viewport Layers */
         #cam-layer, #gal-layer { position: absolute; top:0; left:0; width:100%; height:100%; display:none; z-index: 50; }
         video, img { width:100%; height:100%; object-fit:cover; }
 
-        /* Retro Filters */
+        /* Preview-only filters (Recording uses Canvas-baked filters) */
         .f0_Nokia { filter: grayscale(100%) sepia(100%) hue-rotate(60deg) contrast(140%); }
         .f1_BW    { filter: grayscale(100%) contrast(160%); }
         .f2_Sepia { filter: sepia(100%) contrast(120%); }
@@ -48,7 +48,7 @@
         .ui-center { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; color: #000; text-align: center; }
         .footer { font-size: 11px; text-align: center; border-top: 1px solid #000; z-index: 100; padding: 3px 0; color: #000; font-weight: bold; background: rgba(148, 180, 148, 0.4); }
 
-        /* Controls - 3x2 Grid */
+        /* Buttons Grid */
         .controls-right { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-left: 12px; }
         .p-btn {
             width: 65px; height: 48px; background: var(--btn-plastic); border: none;
@@ -57,14 +57,13 @@
         }
         .p-btn:active { transform: translateY(2px); box-shadow: 0 2px #2d3436; }
         .p-btn.red { background: var(--rec-red); box-shadow: 0 4px #822222; }
-        .p-btn.blue { background: #2980b9; box-shadow: 0 4px #1a5276; }
 
         #filter-indicator {
             position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
             font-size: 9px; color: #fff; background: #000; padding: 2px 8px; border-radius: 10px; z-index: 200; display:none;
         }
-        .rec-active { color: var(--rec-red); animation: pulse 1s infinite; display: none; }
-        @keyframes pulse { 50% { opacity: 0; } }
+        .rec-dot { color: var(--rec-red); animation: blink 1s infinite; display: none; }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
@@ -75,7 +74,9 @@
         <div class="bezel">
             <div class="screen">
                 <div class="top-info">
-                    <span>|||</span> <span id="clock">00:00</span> <span id="rec-status" class="rec-active">●REC</span> <span>|||</span>
+                    <span id="rec-dot" class="rec-dot">●REC</span> 
+                    <span id="clock">00:00:00</span>
+                    <span id="rec-timer" style="display:none; color:red;">00s</span>
                 </div>
 
                 <div id="cam-layer"><video id="preview" autoplay playsinline muted></video></div>
@@ -92,47 +93,36 @@
 
     <div class="controls-right">
         <button class="p-btn" style="background:#d35400" onclick="cycleFilter()"><span>☼</span>FLTR</button>
-        <button class="p-btn blue" onclick="flipCamera()"><span>🔄</span>FLIP</button>
-        
+        <button class="p-btn" style="background:#2980b9" onclick="flipCamera()"><span>🔄</span>FLIP</button>
         <button class="p-btn red" onclick="pressAction()"><span>OK</span>ACT</button>
         <button class="p-btn" onclick="navStep(-1)"><span>▲</span>UP</button>
-        
         <button class="p-btn" onclick="downloadCurrent()"><span>⬇</span>SAVE</button>
         <button class="p-btn" onclick="pressBack()"><span>←</span>BACK</button>
     </div>
 </div>
 
-<canvas id="export-buffer" width="640" height="480" style="display:none;"></canvas>
+<canvas id="rec-canvas" width="640" height="480" style="display:none;"></canvas>
 
 <script>
     let state = "HOME", facingMode = "environment";
     const filters = [
-        {name: "Nokia Green", class: "f0_Nokia", ctxFilter: "grayscale(100%) sepia(100%) hue-rotate(60deg) contrast(140%)"},
-        {name: "Classic B&W", class: "f1_BW", ctxFilter: "grayscale(100%) contrast(160%)"},
-        {name: "Vintage Sepia", class: "f2_Sepia", ctxFilter: "sepia(100%) contrast(120%)"}
+        {name: "Nokia Green", class: "f0_Nokia", ctx: "grayscale(1) sepia(1) hue-rotate(60deg) contrast(1.4)"},
+        {name: "Classic B&W", class: "f1_BW", ctx: "grayscale(1) contrast(1.6)"},
+        {name: "Vintage Sepia", class: "f2_Sepia", ctx: "sepia(1) contrast(1.2)"}
     ];
-    let filterIdx = 0, zoom = 1.0, photos = [], stream = null, recorder = null, chunks = [];
-    let menuIdx = 0, galleryIdx = 0;
-    const menus = ["PHOTO MODE", "VIDEO MODE", "GALLERY"];
+    let filterIdx = 0, photos = [], stream = null, recorder = null, chunks = [];
+    let menuIdx = 0, galleryIdx = 0, recStartTime = 0;
 
     const uiMain = document.getElementById("ui-main"), uiFooter = document.getElementById("ui-footer");
     const camLayer = document.getElementById("cam-layer"), galLayer = document.getElementById("gal-layer");
     const videoPreview = document.getElementById("preview"), fltrInd = document.getElementById("filter-indicator");
-    const buffer = document.getElementById("export-buffer");
-
-    function beep(f=800, d=50) {
-        try { const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const o = ctx.createOscillator(); const g = ctx.createGain();
-        o.frequency.value = f; g.gain.value = 0.02; o.connect(g); g.connect(ctx.destination);
-        o.start(); setTimeout(() => o.stop(), d); } catch(e){}
-    }
+    const recCanvas = document.getElementById("rec-canvas");
+    const ctx = recCanvas.getContext("2d");
 
     async function startCam(isVid) {
         try {
             if(stream) stream.getTracks().forEach(t => t.stop());
-            stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: facingMode, width: 640, height: 480 } 
-            });
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } });
             videoPreview.srcObject = stream;
             state = isVid ? "CAMERA_VIDEO" : "CAMERA_PHOTO";
             camLayer.style.display = "block"; galLayer.style.display = "none"; uiMain.style.visibility = "hidden";
@@ -141,62 +131,90 @@
         } catch (e) { alert("Camera Error"); }
     }
 
-    async function flipCamera() {
-        if (!state.startsWith("CAMERA")) return;
-        beep(1200, 30);
-        facingMode = (facingMode === "user") ? "environment" : "user";
-        await startCam(state === "CAMERA_VIDEO");
-    }
-
     function pressAction() {
-        beep();
         if (state === "HOME") { state = "MENU"; updateUI(); }
         else if (state === "MENU") {
-            if (menus[menuIdx] === "PHOTO MODE") startCam(false);
-            else if (menus[menuIdx] === "VIDEO MODE") startCam(true);
-            else if (menus[menuIdx] === "GALLERY") openGallery();
+            if (menuIdx === 0) startCam(false);
+            else if (menuIdx === 1) startCam(true);
+            else if (menuIdx === 2) openGallery();
         }
         else if (state === "CAMERA_PHOTO") capturePhoto();
         else if (state === "CAMERA_VIDEO") toggleVideo();
     }
 
+    // --- BAKED PHOTO CAPTURE ---
     function capturePhoto() {
-        const ctx = buffer.getContext("2d");
-        ctx.filter = filters[filterIdx].ctxFilter; // BAKE FILTER INTO IMAGE
+        ctx.filter = filters[filterIdx].ctx;
         ctx.drawImage(videoPreview, 0, 0, 640, 480);
-        photos.push({type: 'img', src: buffer.toDataURL("image/jpeg")});
+        // Overlay Timestamp on Photo
+        ctx.filter = "none"; ctx.fillStyle = "black"; ctx.font = "20px Courier";
+        ctx.fillText(new Date().toLocaleTimeString(), 20, 460);
+        
+        photos.push({type: 'img', src: recCanvas.toDataURL("image/jpeg")});
         uiFooter.innerText = "CAPTURED!";
         setTimeout(() => updateUI(), 800);
     }
 
+    // --- BAKED VIDEO RECORDING ENGINE ---
     function toggleVideo() {
         if (recorder && recorder.state === "recording") {
             recorder.stop();
-            document.getElementById("rec-status").style.display = "none";
+            document.getElementById("rec-dot").style.display = "none";
+            document.getElementById("rec-timer").style.display = "none";
         } else {
             chunks = [];
-            recorder = new MediaRecorder(stream);
+            const canvasStream = recCanvas.captureStream(30); // Capture canvas at 30fps
+            recorder = new MediaRecorder(canvasStream, { mimeType: 'video/webm;codecs=vp8' });
+            
             recorder.ondataavailable = e => chunks.push(e.data);
             recorder.onstop = () => {
-                const blob = new Blob(chunks, { type: 'video/mp4' });
-                photos.push({type: 'vid', src: URL.createObjectURL(blob), filter: filters[filterIdx].class});
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                photos.push({type: 'vid', src: URL.createObjectURL(blob)});
                 uiFooter.innerText = "SAVED!";
             };
+
+            recStartTime = Date.now();
             recorder.start();
-            document.getElementById("rec-status").style.display = "inline";
-            uiFooter.innerText = "STOP (OK)";
+            document.getElementById("rec-dot").style.display = "inline";
+            document.getElementById("rec-timer").style.display = "inline";
+            requestAnimationFrame(drawVideoFrame);
+        }
+    }
+
+    function drawVideoFrame() {
+        if (recorder && recorder.state === "recording") {
+            // 1. Apply Filter
+            ctx.filter = filters[filterIdx].ctx;
+            ctx.drawImage(videoPreview, 0, 0, 640, 480);
+            
+            // 2. Apply "Handycam" Overlays directly to pixels
+            ctx.filter = "none";
+            ctx.fillStyle = "red"; ctx.font = "bold 24px Arial";
+            ctx.fillText("● REC", 30, 50);
+            
+            ctx.fillStyle = "white"; ctx.font = "20px Courier";
+            const elapsed = Math.floor((Date.now() - recStartTime) / 1000);
+            ctx.fillText(`00:00:${elapsed.toString().padStart(2, '0')}`, 480, 50);
+            ctx.fillText(new Date().toLocaleDateString(), 30, 450);
+
+            document.getElementById("rec-timer").innerText = elapsed + "s";
+            requestAnimationFrame(drawVideoFrame);
         }
     }
 
     function downloadCurrent() {
         if (state !== "GALLERY" || photos.length === 0) return;
-        beep(1500, 100);
         const item = photos[galleryIdx];
         const link = document.createElement('a');
         link.href = item.src;
-        link.download = `NOKIA_${Date.now()}.${item.type === 'img' ? 'jpg' : 'mp4'}`;
+        link.download = `NOKIA_RETRO_${Date.now()}.${item.type === 'img' ? 'jpg' : 'webm'}`;
         link.click();
-        uiFooter.innerText = "DOWNLOADED";
+    }
+
+    async function flipCamera() {
+        if (!state.startsWith("CAMERA")) return;
+        facingMode = (facingMode === "user") ? "environment" : "user";
+        await startCam(state === "CAMERA_VIDEO");
     }
 
     function openGallery() {
@@ -209,14 +227,13 @@
         camLayer.style.display = "none"; galLayer.style.display = "block";
         const item = photos[galleryIdx];
         const gImg = document.getElementById("gal-img"), gVid = document.getElementById("gal-vid");
-        if(item.type === 'img') { gImg.src = item.src; gImg.style.display = "block"; gVid.style.display = "none"; gImg.className = ""; }
-        else { gVid.src = item.src; gVid.style.display = "block"; gImg.style.display = "none"; gVid.className = item.filter; gVid.play(); }
-        uiFooter.innerText = `IMG ${galleryIdx + 1}/${photos.length} (SAVE=DWN)`;
+        if(item.type === 'img') { gImg.src = item.src; gImg.style.display = "block"; gVid.style.display = "none"; }
+        else { gVid.src = item.src; gVid.style.display = "block"; gImg.style.display = "none"; gVid.play(); }
+        uiFooter.innerText = `ITEM ${galleryIdx + 1}/${photos.length}`;
     }
 
     function navStep(dir) {
-        beep(700, 20);
-        if (state === "MENU") { menuIdx = (menuIdx + dir + menus.length) % menus.length; updateUI(); }
+        if (state === "MENU") { menuIdx = (menuIdx + dir + 3) % 3; updateUI(); }
         else if (state === "GALLERY") { galleryIdx = (galleryIdx + dir + photos.length) % photos.length; updateGallery(); }
     }
 
@@ -233,13 +250,14 @@
     }
 
     function updateUI() {
+        const menus = ["PHOTO MODE", "VIDEO MODE", "GALLERY"];
         if (state === "HOME") { uiMain.style.visibility = "visible"; uiMain.innerHTML = "NOKIA<br>ACTION"; uiFooter.innerText = "MENU"; }
         else if (state === "MENU") { uiMain.innerHTML = `📂<br>${menus[menuIdx]}`; uiFooter.innerText = "SELECT (OK)"; }
-        else if (state.startsWith("CAMERA")) { uiFooter.innerText = state === "CAMERA_PHOTO" ? "CAPTURE (OK)" : "REC (OK)"; }
+        else if (state.startsWith("CAMERA")) { uiFooter.innerText = state === "CAMERA_PHOTO" ? "CAPTURE (OK)" : "STOP (OK)"; }
     }
 
     setInterval(() => {
-        const d = new Date(); document.getElementById('clock').innerText = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
+        const d = new Date(); document.getElementById('clock').innerText = d.toLocaleTimeString();
     }, 1000);
 </script>
 </body>
